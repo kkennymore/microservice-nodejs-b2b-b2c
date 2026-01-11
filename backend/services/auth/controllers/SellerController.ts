@@ -1,14 +1,14 @@
 // backend/services/auth/controllers/SellerController.ts
 import * as Joi from 'joi';
 import { Op } from 'sequelize';
-import config from '../../../shared/config';
-import EVENTS from '../../../shared/events';
-import pligsLogger from '../utils/logger';
+import config from '@/shared/config';
+import EVENTS from '@/shared/events';
+import pligsLogger from '@/utils/logger';
 
-import { AuthenticatedRequest, AsyncRequestHandler } from '../../../shared/interfaces/common';
+import { AuthenticatedRequest, AsyncRequestHandler } from '@/shared/interfaces/common';
 import { Response, Request } from 'express';
-import { createSuccessResponse, createErrorResponse } from '../../../shared/responseHelper';
-import { HTTP_STATUS } from '../../../shared/statusCodes';
+import { createSuccessResponse, createErrorResponse } from '@/shared/responseHelper';
+import { HTTP_STATUS } from '@/shared/statusCodes';
 
 class PligsSellerController {
   private models: any;
@@ -28,9 +28,9 @@ class PligsSellerController {
   }
 
   // Get seller dashboard overview
-  pligsGetDashboardOverview: AsyncRequestHandler = async (req: AuthenticatedRequest & Request, res: Response) => {
+  pligsGetDashboardOverview = async (req: AuthenticatedRequest & Request, res: Response) => {
     try {
-      const sellerId = req.user.id;
+      const sellerId = req.user?.id;
 
       // Get seller stats
       const totalProducts = await this.models.product.count({

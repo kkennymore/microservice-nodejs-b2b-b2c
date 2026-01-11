@@ -119,7 +119,7 @@ class PligsAuthController {
     }
   }
 
-  pligsValidateRegistration: AsyncRequestHandler = async (req: AuthenticatedRequest & Request, res: Response, next: Function) => {
+  pligsValidateRegistration = async (req: AuthenticatedRequest & Request, res: Response, next: Function) => {
     const schema = Joi.object({
       username: Joi.string().min(3).max(30).required(),
       email: Joi.string().email().required(),
@@ -132,12 +132,12 @@ class PligsAuthController {
 
     const { error } = schema.validate(req.body || {});
     if (error) {
-      return createErrorResponse(res, HTTP_STATUS.BAD_REQUEST, error.details[0]?.message);
+      return createErrorResponse(res, HTTP_STATUS.BAD_REQUEST, error.details[0]??.message);
     }
     next();
   };
 
-  pligsRegister: AsyncRequestHandler = async (req: AuthenticatedRequest & Request, res: Response) => {
+  pligsRegister = async (req: AuthenticatedRequest & Request, res: Response) => {
     try {
       const { username, email, password, firstName, lastName, phone, role }: RegisterDto = req.body || {};
 
@@ -172,16 +172,16 @@ class PligsAuthController {
       });
 
       // Create password record
-      await this.models.password.pligsCreatePassword(user.id, hashedPassword);
+      await this.models.password.pligsCreatePassword(user?.id, hashedPassword);
 
       // Create default related records
-      await this.models.preference.pligsUpsertPreferences(user.id, {});
-      await this.models.security.pligsUpsertSecurity(user.id, {});
-      await this.models.profile.pligsUpsertProfile(user.id, {});
+      await this.models.preference.pligsUpsertPreferences(user?.id, {});
+      await this.models.security.pligsUpsertSecurity(user?.id, {});
+      await this.models.profile.pligsUpsertProfile(user?.id, {});
 
       // Generate email verification token
       const verificationToken = crypto.randomBytes(32).toString('hex');
-      await this.redisOp('setex', `email_verify:${user.id}`, 86400, verificationToken);
+      await this.redisOp('setex', `email_verify:${user?.id}`, 86400, verificationToken);
 
       // Send verification email
       await (pligsEmailService as any).pligsSendVerificationEmail(user.email, verificationToken, {
@@ -193,14 +193,14 @@ class PligsAuthController {
       const tokens = pligsAuthService.pligsGenerateTokens(user);
 
       // Cache user session
-      await this.redisClient.setex(`session:${user.id}`, 3600, JSON.stringify({ userId: user.id, role: user.role }));
+      await this.redisClient.setex(`session:${user?.id}`, 3600, JSON.stringify({ userId: user?.id, role: user.role }));
 
       // Publish event
-      await this.pligsPublishEvent(EVENTS.USER_REGISTERED, { userId: user.id, email: user.email, role: user.role });
+      await this.pligsPublishEvent(EVENTS.USER_REGISTERED, { userId: user?.id, email: user.email, role: user.role });
 
       return createCreatedResponse(res, {
         user: {
-          id: user.id,
+          id: user?.id,
           username: user.username,
           email: user.email,
           firstName: user.firstName,
@@ -217,7 +217,7 @@ class PligsAuthController {
     }
   };
 
-  pligsLogin: AsyncRequestHandler = async (req: AuthenticatedRequest & Request, res: Response) => {
+  pligsLogin = async (req: AuthenticatedRequest & Request, res: Response) => {
     try {
       const { identifier, password } = req.body || {};
 
@@ -227,7 +227,7 @@ class PligsAuthController {
       }
 
       // Check if account is locked
-      const isLocked = await this.models.password.pligsIsAccountLocked(user.id);
+      const isLocked = await this.models.password.pligsIsAccountLocked(user?.id);
       if (isLocked) {
         return createErrorResponse(res, HTTP_STATUS.LOCKED, 'Account is temporarily locked due to too many failed login attempts');
       }
@@ -237,7 +237,7 @@ class PligsAuthController {
         return createBusinessErrorResponse(res, BUSINESS_STATUS.VALIDATION_ERROR, HTTP_STATUS.BAD_REQUEST, 'Please use social login for this account');
       }
 
-      const passwordRecord = await this.models.password.pligsFindByUserId(user.id);
+      const passwordRecord = await this.models.password.pligsFindByUserId(user?.id);
       if (!passwordRecord) {
         return createBusinessErrorResponse(res, BUSINESS_STATUS.INVALID_CREDENTIALS, HTTP_STATUS.UNAUTHORIZED);
       }
@@ -245,27 +245,27 @@ class PligsAuthController {
       const isPasswordValid = await bcrypt.compare(password, passwordRecord.password);
       if (!isPasswordValid) {
         // Record failed login attempt
-        await this.models.password.pligsRecordFailedLogin(user.id);
+        await this.models.password.pligsRecordFailedLogin(user?.id);
         return createBusinessErrorResponse(res, BUSINESS_STATUS.INVALID_CREDENTIALS, HTTP_STATUS.UNAUTHORIZED);
       }
 
       // Record successful login
-      await this.models.password.pligsResetFailedLogins(user.id);
+      await this.models.password.pligsResetFailedLogins(user?.id);
 
       // Update last login
-      await this.models.user.pligsUpdateUser(user.id, { lastLoginAt: new Date() });
+      await this.models.user.pligsUpdateUser(user?.id, { lastLoginAt: new Date() });
 
       const tokens = pligsAuthService.pligsGenerateTokens(user);
 
       // Cache session
-      await this.redisClient.setex(`session:${user.id}`, 3600, JSON.stringify({ userId: user.id, role: user.role }));
+      await this.redisClient.setex(`session:${user?.id}`, 3600, JSON.stringify({ userId: user?.id, role: user.role }));
 
       // Publish event
-      await this.pligsPublishEvent(EVENTS.USER_LOGGED_IN, { userId: user.id, email: user.email });
+      await this.pligsPublishEvent(EVENTS.USER_LOGGED_IN, { userId: user?.id, email: user.email });
 
       return createSuccessResponse(res, {
         user: {
-          id: user.id,
+          id: user?.id,
           username: user.username,
           email: user.email,
           firstName: user.firstName,
@@ -283,7 +283,7 @@ class PligsAuthController {
     }
   };
 
-  pligsRefreshToken: AsyncRequestHandler = async (req: AuthenticatedRequest & Request, res: Response) => {
+  pligsRefreshToken = async (req: AuthenticatedRequest & Request, res: Response) => {
     try {
       const { refreshToken } = req.body || {};
       const decoded = jwt.verify(refreshToken, config.jwt.secret) as CustomJwtPayload;
@@ -302,7 +302,7 @@ class PligsAuthController {
     }
   };
 
-  pligsLogout: AsyncRequestHandler = async (req: AuthenticatedRequest & Request, res: Response) => {
+  pligsLogout = async (req: AuthenticatedRequest & Request, res: Response) => {
     try {
       const userId = req.user?.id;
       if (!userId) {
@@ -317,7 +317,7 @@ class PligsAuthController {
     }
   };
 
-  pligsVerifyEmail: AsyncRequestHandler = async (req: AuthenticatedRequest & Request, res: Response) => {
+  pligsVerifyEmail = async (req: AuthenticatedRequest & Request, res: Response) => {
     try {
       const { token } = req.body || {};
       const { userId } = req.params || {};
@@ -339,7 +339,7 @@ class PligsAuthController {
     }
   };
 
-  pligsForgotPassword: AsyncRequestHandler = async (req: AuthenticatedRequest & Request, res: Response) => {
+  pligsForgotPassword = async (req: AuthenticatedRequest & Request, res: Response) => {
     try {
       const { email } = req.body || {};
       const user = await this.userModel.pligsFindByEmail(email);
@@ -349,7 +349,7 @@ class PligsAuthController {
       }
 
       const resetToken = crypto.randomBytes(32).toString('hex');
-      await this.redisClient.setex(`password_reset:${user.id}`, 3600, resetToken);
+      await this.redisClient.setex(`password_reset:${user?.id}`, 3600, resetToken);
 
       await (pligsEmailService as any).pligsSendPasswordResetEmail(user.email, resetToken, {
         firstName: user.firstName,
@@ -363,7 +363,7 @@ class PligsAuthController {
     }
   };
 
-  pligsResetPassword: AsyncRequestHandler = async (req: AuthenticatedRequest & Request, res: Response) => {
+  pligsResetPassword = async (req: AuthenticatedRequest & Request, res: Response) => {
     try {
       const { token, newPassword } = req.body || {};
       const userId = req.params?.userId;
@@ -384,7 +384,7 @@ class PligsAuthController {
     }
   };
 
-  pligsValidateProfileUpdate: AsyncRequestHandler = async (req: AuthenticatedRequest & Request, res: Response, next: Function) => {
+  pligsValidateProfileUpdate = async (req: AuthenticatedRequest & Request, res: Response, next: Function) => {
     const schema = Joi.object({
       firstName: Joi.string().min(2).max(50),
       lastName: Joi.string().min(2).max(50),
@@ -404,7 +404,7 @@ class PligsAuthController {
 
     const { error } = schema.validate(req.body);
     if (error) {
-      createErrorResponse(res, HTTP_STATUS.BAD_REQUEST, error.details[0].message);
+      createErrorResponse(res, HTTP_STATUS.BAD_REQUEST, error.details[0]??.message);
       return;
     }
     next();
@@ -428,7 +428,7 @@ class PligsAuthController {
     });
 
     const { error } = schema.validate(req.body);
-    if (error) return res.status(400).json({ success: false, message: error.details[0].message });
+    if (error) return res.status(400).json({ success: false, message: error.details[0]?.message });
     next();
   };
 
@@ -441,7 +441,7 @@ class PligsAuthController {
     const { error } = schema.validate(req.body);
     if (error) return res.status(400).json({
       status: false,
-      message: error.details[0].message,
+      message: error.details[0]?.message,
       data: []
     });
     next();
@@ -457,15 +457,15 @@ class PligsAuthController {
     const { error } = schema.validate(req.body);
     if (error) return res.status(400).json({
       status: false,
-      message: error.details[0].message,
+      message: error.details[0]?.message,
       data: []
     });
     next();
   };
 
-  pligsGetProfile: AsyncRequestHandler = async (req: AuthenticatedRequest & Request, res: Response) => {
+  pligsGetProfile = async (req: AuthenticatedRequest & Request, res: Response) => {
     try {
-      const user = await this.models.user.pligsGetProfile(req.user.id);
+      const user = await this.models.user.pligsGetProfile(req.user?.id);
       res.json({
         success: true,
         data: user
@@ -476,12 +476,12 @@ class PligsAuthController {
     }
   }
 
-  pligsUpdateProfile: AsyncRequestHandler = async (req: AuthenticatedRequest & Request, res: Response) => {
+  pligsUpdateProfile = async (req: AuthenticatedRequest & Request, res: Response) => {
     try {
-      const updatedUser = await this.models.user.pligsUpdateProfile(req.user.id, req.body);
+      const updatedUser = await this.models.user.pligsUpdateProfile(req.user?.id, req.body);
 
       // Publish event
-      await this.pligsPublishEvent(EVENTS.USER_PROFILE_UPDATED, { userId: req.user.id });
+      await this.pligsPublishEvent(EVENTS.USER_PROFILE_UPDATED, { userId: req.user?.id });
 
       res.json({
         success: true,
@@ -496,7 +496,7 @@ class PligsAuthController {
 
   pligsUploadProfileImage = [
     upload.single('profileImage'),
-    async (req, res) => {
+    async (req: Request, res: Response) => {
       try {
         if (!req.file) {
           return createBusinessErrorResponse(res, BUSINESS_STATUS.VALIDATION_ERROR, HTTP_STATUS.BAD_REQUEST);
@@ -531,10 +531,10 @@ class PligsAuthController {
     }
   ];
 
-  async pligsSubmitKyc(req, res) {
+  async pligsSubmitKyc(req: Request, res: Response) {
     try {
-      const user = await this.models.user.pligsFindById(req.user.id);
-      const existingKyc = await this.models.kyc.pligsFindByUserId(req.user.id);
+      const user = await this.models.user.pligsFindById(req.user?.id);
+      const existingKyc = await this.models.kyc.pligsFindByUserId(req.user?.id);
 
       if (existingKyc && existingKyc.status === 'approved') {
         return createBusinessErrorResponse(res, BUSINESS_STATUS.VALIDATION_ERROR, HTTP_STATUS.BAD_REQUEST);
@@ -544,7 +544,7 @@ class PligsAuthController {
 
       // Handle file uploads for KYC documents
       if (req.files) {
-        if (req.files.idFrontImage && req.files.idFrontImage[0]) {
+        if (req.files?.idFrontImage && req.files.idFrontImage[0]) {
           kycData.idFrontImage = await pligsFileService.pligsUploadFile(req.files.idFrontImage[0]);
         }
         if (req.files.idBackImage && req.files.idBackImage[0]) {
@@ -558,11 +558,11 @@ class PligsAuthController {
         }
       }
 
-      const updatedKyc = await this.models.user.pligsUpdateKyc(req.user.id, kycData);
-      const fullUser = await this.models.user.pligsFindById(req.user.id);
+      const updatedKyc = await this.models.user.pligsUpdateKyc(req.user?.id, kycData);
+      const fullUser = await this.models.user.pligsFindById(req.user?.id);
 
       // Publish event
-      await this.pligsPublishEvent('kyc.submitted', { userId: req.user.id, kycData });
+      await this.pligsPublishEvent('kyc.submitted', { userId: req.user?.id, kycData });
 
       res.json({
         success: true,
@@ -575,9 +575,9 @@ class PligsAuthController {
     }
   }
 
-  async pligsGetKycStatus(req, res) {
+  async pligsGetKycStatus(req: Request, res: Response) {
     try {
-      const kyc = await this.models.kyc.pligsFindByUserId(req.user.id);
+      const kyc = await this.models.kyc.pligsFindByUserId(req.user?.id);
       res.json({
         success: true,
         data: kyc ? {
@@ -599,7 +599,7 @@ class PligsAuthController {
     try {
       const { currentPassword, newPassword } = req.body;
 
-      const user = await this.userModel.pligsFindById(req.user.id);
+      const user = await this.userModel.pligsFindById(req.user?.id);
       const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password);
 
       if (!isCurrentPasswordValid) {
@@ -607,10 +607,10 @@ class PligsAuthController {
       }
 
       const hashedNewPassword = await bcrypt.hash(newPassword, 12);
-      await this.userModel.pligsUpdateUser(req.user.id, { password: hashedNewPassword });
+      await this.userModel.pligsUpdateUser(req.user?.id, { password: hashedNewPassword });
 
       // Publish event
-      await this.pligsPublishEvent(EVENTS.USER_PASSWORD_CHANGED, { userId: req.user.id });
+      await this.pligsPublishEvent(EVENTS.USER_PASSWORD_CHANGED, { userId: req.user?.id });
 
       res.json({
         success: true,
@@ -653,7 +653,7 @@ class PligsAuthController {
       const fullUser = await this.models.user.pligsFindById(userId);
 
       // Publish event
-      await this.pligsPublishEvent('kyc.approved', { userId, approvedBy: req.user.id });
+      await this.pligsPublishEvent('kyc.approved', { userId, approvedBy: req.user?.id });
 
       res.json({
         success: true,
@@ -683,7 +683,7 @@ class PligsAuthController {
       const fullUser = await this.models.user.pligsFindById(userId);
 
       // Publish event
-      await this.pligsPublishEvent('kyc.rejected', { userId, rejectedBy: req.user.id, reason });
+      await this.pligsPublishEvent('kyc.rejected', { userId, rejectedBy: req.user?.id, reason });
 
       res.json({
         success: true,
@@ -750,7 +750,7 @@ class PligsAuthController {
       await this.models.user.pligsSoftDeleteUser(userId);
 
       // Publish event
-      await this.pligsPublishEvent(EVENTS.USER_DELETED, { userId, deletedBy: req.user.id });
+      await this.pligsPublishEvent(EVENTS.USER_DELETED, { userId, deletedBy: req.user?.id });
 
       res.json({
         success: true,
@@ -786,11 +786,11 @@ class PligsAuthController {
       const tokens = pligsAuthService.pligsGenerateTokens(user);
 
       // Cache session
-      await this.redisClient.setex(`session:${user.id}`, 3600, JSON.stringify({ userId: user.id, role: user.role }));
+      await this.redisClient.setex(`session:${user?.id}`, 3600, JSON.stringify({ userId: user?.id, role: user.role }));
 
       // Publish event
       await this.pligsPublishEvent(EVENTS.USER_LOGGED_IN, {
-        userId: user.id,
+        userId: user?.id,
         email: user.email,
         provider,
         action
@@ -801,7 +801,7 @@ class PligsAuthController {
         message: `${action === 'register' ? 'Account created and logged in' : 'Login successful'} via ${provider}`,
         data: {
           user: {
-            id: user.id,
+            id: user?.id,
             username: user.username,
             email: user.email,
             firstName: user.firstName,
@@ -867,7 +867,7 @@ class PligsAuthController {
   // Get current user information
   pligsGetCurrentUser = async (req, res) => {
     try {
-      const user = await this.models.user.pligsFindById(req.user.id);
+      const user = await this.models.user.pligsFindById(req.user?.id);
       if (!user) {
         return res.status(404).json({
           success: false,
@@ -876,7 +876,7 @@ class PligsAuthController {
       }
 
       // Get user preferences
-      const preferences = await this.models.preference.pligsFindByUserId(user.id);
+      const preferences = await this.models.preference.pligsFindByUserId(user?.id);
 
       res.json({
         success: true,
@@ -923,7 +923,7 @@ class PligsAuthController {
 
       // Generate new verification token
       const verificationToken = jwt.sign(
-        { userId: user.id, type: 'email_verification' },
+        { userId: user?.id, type: 'email_verification' },
         config.jwt.secret,
         { expiresIn: '24h' }
       );
@@ -976,10 +976,10 @@ class PligsAuthController {
       const hashedPassword = await bcrypt.hash(password, 12);
 
       // Update password
-      await this.models.password.pligsUpdatePassword(user.id, hashedPassword);
+      await this.models.password.pligsUpdatePassword(user?.id, hashedPassword);
 
       // Publish event
-      await this.pligsPublishEvent(EVENTS.USER_PASSWORD_CHANGED, { userId: user.id });
+      await this.pligsPublishEvent(EVENTS.USER_PASSWORD_CHANGED, { userId: user?.id });
 
       res.json({
         success: true,
@@ -999,7 +999,7 @@ class PligsAuthController {
   pligsUpdatePreferences = async (req, res) => {
     try {
       const { language, currency, theme, notifications } = req.body;
-      const userId = req.user.id;
+      const userId = req.user?.id;
 
       // Update or create preferences
       const existingPrefs = await this.models.preference.pligsFindByUserId(userId);
@@ -1039,7 +1039,7 @@ class PligsAuthController {
   pligsChangeEmail = async (req, res) => {
     try {
       const { newEmail, password } = req.body;
-      const userId = req.user.id;
+      const userId = req.user?.id;
 
       const user = await this.models.user.pligsFindById(userId);
 
@@ -1054,7 +1054,7 @@ class PligsAuthController {
 
       // Check if new email is already taken
       const existingUser = await this.models.user.pligsFindByEmail(newEmail);
-      if (existingUser && existingUser.id !== userId) {
+      if (existingUser && existinguser?.id !== userId) {
         return res.status(400).json({
           success: false,
           message: 'Email address already in use'
@@ -1100,7 +1100,7 @@ class PligsAuthController {
     upload.single('avatar'),
     async (req, res) => {
       try {
-        const userId = req.user.id;
+        const userId = req.user?.id;
 
         if (!req.file) {
           return res.status(400).json({
@@ -1196,7 +1196,7 @@ class PligsAuthController {
   // Two-factor authentication
   pligsEnable2FA = async (req, res) => {
     try {
-      const userId = req.user.id;
+      const userId = req.user?.id;
 
       // Generate TOTP secret
       const speakeasy = await import('speakeasy');
@@ -1232,7 +1232,7 @@ class PligsAuthController {
   pligsVerify2FA = async (req, res) => {
     try {
       const { token } = req.body || {};
-      const userId = req.user.id;
+      const userId = req.user?.id;
 
       const speakeasy = await import('speakeasy');
       const secret = await this.redisClient.get(`2fa_secret:${userId}`);
@@ -1284,7 +1284,7 @@ class PligsAuthController {
   pligsDisable2FA = async (req, res) => {
     try {
       const { password } = req.body || {};
-      const userId = req.user.id;
+      const userId = req.user?.id;
 
       // Verify password
       const isValidPassword = await (pligsAuthService as any).pligsVerifyPassword(password, userId);
@@ -1318,7 +1318,7 @@ class PligsAuthController {
   // Subscription management
   pligsGetSubscription = async (req, res) => {
     try {
-      const userId = req.user.id;
+      const userId = req.user?.id;
       const user = await this.models.user.pligsFindById(userId);
 
       const features = await this.models.user.pligsGetSubscriptionFeatures(userId);
@@ -1345,7 +1345,7 @@ class PligsAuthController {
   pligsUpgradeSubscription = async (req, res) => {
     try {
       const { plan, durationMonths = 1 } = req.body;
-      const userId = req.user.id;
+      const userId = req.user?.id;
 
       const user = await this.models.user.pligsUpgradeSubscription(userId, plan, durationMonths);
 
@@ -1370,7 +1370,7 @@ class PligsAuthController {
   // Security features
   pligsGetLoginHistory = async (req, res) => {
     try {
-      const userId = req.user.id;
+      const userId = req.user?.id;
 
       // In a real implementation, you'd have a login history table
       // For now, return mock data
@@ -1407,7 +1407,7 @@ class PligsAuthController {
 
   pligsGetActiveSessions = async (req, res) => {
     try {
-      const userId = req.user.id;
+      const userId = req.user?.id;
 
       // Mock active sessions data
       const sessions = [
@@ -1437,7 +1437,7 @@ class PligsAuthController {
   pligsTerminateSession = async (req, res) => {
     try {
       const { sessionId } = req.params || {};
-      const userId = req.user.id;
+      const userId = req.user?.id;
 
       // In a real implementation, you'd terminate the specific session
       // For now, just acknowledge
@@ -1458,7 +1458,7 @@ class PligsAuthController {
 
   pligsTerminateAllSessions = async (req, res) => {
     try {
-      const userId = req.user.id;
+      const userId = req.user?.id;
 
       // In a real implementation, you'd terminate all sessions except current
       // For now, just acknowledge

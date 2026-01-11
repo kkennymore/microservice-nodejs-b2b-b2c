@@ -97,7 +97,7 @@ class PligsAdminController {
   }
 
   // Get users with pagination and filters
-  pligsGetUsers: AsyncRequestHandler = async (req: AuthenticatedRequest & Request, res: Response) => {
+  pligsGetUsers = async (req: AuthenticatedRequest & Request, res: Response) => {
     try {
       const query = req.query as any;
       const page = parseInt(query.page) || 1;
@@ -157,7 +157,7 @@ class PligsAdminController {
   };
 
   // Update user
-  pligsUpdateUser: AsyncRequestHandler = async (req: AuthenticatedRequest & Request, res: Response) => {
+  pligsUpdateUser = async (req: AuthenticatedRequest & Request, res: Response) => {
     try {
       const { id } = req.params as { id: string };
       const updateData = req.body as UserUpdateData;
@@ -174,7 +174,7 @@ class PligsAdminController {
 
       const { error } = schema.validate(updateData);
       if (error) {
-        return createErrorResponse(res, HTTP_STATUS.BAD_REQUEST, error.details[0].message);
+        return createErrorResponse(res, HTTP_STATUS.BAD_REQUEST, error.details[0]?.message);
       }
 
       const user = await this.models.user.findByPk(id) as UserModel | null;
@@ -196,7 +196,7 @@ class PligsAdminController {
   };
 
   // Delete/Deactivate user
-  pligsDeactivateUser: AsyncRequestHandler = async (req: AuthenticatedRequest & Request, res: Response) => {
+  pligsDeactivateUser = async (req: AuthenticatedRequest & Request, res: Response) => {
     try {
       const { id } = req.params as { id: string };
 
@@ -219,7 +219,7 @@ class PligsAdminController {
   };
 
   // Get user details
-  pligsGetUserDetails: AsyncRequestHandler = async (req: AuthenticatedRequest & Request, res: Response) => {
+  pligsGetUserDetails = async (req: AuthenticatedRequest & Request, res: Response) => {
     try {
       const { id } = req.params as { id: string };
 
@@ -244,7 +244,7 @@ class PligsAdminController {
   };
 
   // Get user statistics
-  pligsGetUserStats: AsyncRequestHandler = async (req: AuthenticatedRequest & Request, res: Response) => {
+  pligsGetUserStats = async (req: AuthenticatedRequest & Request, res: Response) => {
     try {
       const totalUsers = await this.models.user.count();
       const activeUsers = await this.models.user.count({ where: { isActive: true } });
