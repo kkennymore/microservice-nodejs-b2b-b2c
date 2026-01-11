@@ -1,0 +1,6925 @@
+{
+	"info": {
+		"_postman_id": "12345678-1234-1234-1234-123456789012",
+		"name": "Microservices B2B-B2C Multivendor Marketplace - Complete API Collection",
+		"description": "Comprehensive API collection for the Microservices B2B-B2C Multivendor Marketplace platform with all 21 microservices including REST APIs and WebSocket endpoints. Features authentication, products, transactions, messaging, notifications, advertising, ticketing, reviews, promotions, shipping, AI recommender, analytics, wishlist, search, SEO, loyalty, social features, enhanced analytics, and system management.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "12345678"
+	},
+	"item": [
+		{
+			"name": "🌐 API Gateway (Port 4000)",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{gateway_url}}/health",
+							"host": [
+								"{{gateway_url}}"
+							],
+							"path": [
+								"health"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "🔐 Authentication Service (Port 3001)",
+			"item": [
+				{
+					"name": "Register User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    if (response.data && response.data.tokens) {",
+									"        pm.collectionVariables.set('accessToken', response.data.tokens.accessToken);",
+									"        pm.collectionVariables.set('refreshToken', response.data.tokens.refreshToken);",
+									"        pm.collectionVariables.set('userId', response.data.user.id);",
+									"        pm.collectionVariables.set('userEmail', response.data.user.email);",
+									"        pm.test('Registration successful', () => {",
+									"            pm.expect(response.success).to.be.true;",
+									"        });",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"testuser\",\n    \"email\": \"test@example.com\",\n    \"password\": \"Password123!\",\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"phone\": \"+1234567890\",\n    \"role\": \"seller\"\n}"
+						},
+						"url": {
+							"raw": "{{auth_url}}/api/auth/register",
+							"host": [
+								"{{auth_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    if (response.data && response.data.tokens) {",
+									"        pm.collectionVariables.set('accessToken', response.data.tokens.accessToken);",
+									"        pm.collectionVariables.set('refreshToken', response.data.tokens.refreshToken);",
+									"        pm.collectionVariables.set('userId', response.data.user.id);",
+									"    }",
+									"    pm.test('Login successful', () => {",
+									"        pm.expect(response.success).to.be.true;",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"identifier\": \"test@example.com\",\n    \"password\": \"Password123!\"\n}"
+						},
+						"url": {
+							"raw": "{{auth_url}}/api/auth/login",
+							"host": [
+								"{{auth_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"refreshToken\": \"{{refreshToken}}\"\n}"
+						},
+						"url": {
+							"raw": "{{auth_url}}/api/auth/refresh",
+							"host": [
+								"{{auth_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register Business",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"businessName\": \"Tech Solutions Ltd\",\n    \"businessType\": \"electronics\",\n    \"registrationNumber\": \"REG123456\",\n    \"taxId\": \"TAX789012\",\n    \"address\": {\n        \"street\": \"123 Business St\",\n        \"city\": \"Lagos\",\n        \"state\": \"Lagos\",\n        \"country\": \"Nigeria\",\n        \"postalCode\": \"100001\"\n    },\n    \"contact\": {\n        \"email\": \"contact@techsolutions.com\",\n        \"phone\": \"+234123456789\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{auth_url}}/api/auth/business/register",
+							"host": [
+								"{{auth_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"business",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Verify Email",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": \"verification_token_here\",\n    \"code\": \"123456\"\n}"
+						},
+						"url": {
+							"raw": "{{auth_url}}/api/auth/verify-email/{{userId}}",
+							"host": [
+								"{{auth_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"verify-email",
+								"{{userId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Forgot Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"test@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{auth_url}}/api/auth/forgot-password",
+							"host": [
+								"{{auth_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"forgot-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reset Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": \"reset_token_here\",\n    \"newPassword\": \"NewPassword123!\"\n}"
+						},
+						"url": {
+							"raw": "{{auth_url}}/api/auth/reset-password/{{userId}}",
+							"host": [
+								"{{auth_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"reset-password",
+								"{{userId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "📦 Products Service (Port 3002)",
+			"item": [
+				{
+					"name": "Create Product",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Wireless Bluetooth Headphones\",\n    \"description\": \"Premium wireless headphones with noise cancellation and 30-hour battery life. Perfect for music lovers and professionals.\",\n    \"price\": 299.99,\n    \"wholesalePrice\": 249.99,\n    \"categoryId\": \"electronics-audio\",\n    \"brand\": \"AudioTech\",\n    \"sku\": \"ATH-WBH-001\",\n    \"stock\": 50,\n    \"minOrderQuantity\": 1,\n    \"maxOrderQuantity\": 10,\n    \"weight\": 0.3,\n    \"dimensions\": {\n        \"length\": 20,\n        \"width\": 18,\n        \"height\": 8\n    },\n    \"attributes\": {\n        \"color\": [\"Black\", \"White\", \"Blue\"],\n        \"connectivity\": \"Bluetooth 5.0\",\n        \"batteryLife\": \"30 hours\",\n        \"noiseCancellation\": true\n    },\n    \"images\": [\n        \"headphones-main.jpg\",\n        \"headphones-side.jpg\",\n        \"headphones-detail.jpg\"\n    ],\n    \"videos\": [\"headphones-demo.mp4\"],\n    \"tags\": [\"wireless\", \"bluetooth\", \"headphones\", \"audio\"],\n    \"seoTitle\": \"Premium Wireless Bluetooth Headphones | AudioTech\",\n    \"seoDescription\": \"Experience crystal-clear sound with our premium wireless Bluetooth headphones featuring active noise cancellation.\",\n    \"isApproved\": false,\n    \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{products_url}}/api/products",
+							"host": [
+								"{{products_url}}"
+							],
+							"path": [
+								"api",
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Products",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{products_url}}/api/products?page=1&limit=20&category=electronics&minPrice=100&maxPrice=500&sortBy=price&sortOrder=asc",
+							"host": [
+								"{{products_url}}"
+							],
+							"path": [
+								"api",
+								"products"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								},
+								{
+									"key": "category",
+									"value": "electronics"
+								},
+								{
+									"key": "minPrice",
+									"value": "100"
+								},
+								{
+									"key": "maxPrice",
+									"value": "500"
+								},
+								{
+									"key": "sortBy",
+									"value": "price"
+								},
+								{
+									"key": "sortOrder",
+									"value": "asc"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Product Details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{products_url}}/api/products/{{productId}}",
+							"host": [
+								"{{products_url}}"
+							],
+							"path": [
+								"api",
+								"products",
+								"{{productId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Product",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"price\": 279.99,\n    \"stock\": 45,\n    \"description\": \"Updated description with new features...\",\n    \"attributes\": {\n        \"color\": [\"Black\", \"White\", \"Blue\", \"Red\"],\n        \"warranty\": \"2 years\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{products_url}}/api/products/{{productId}}",
+							"host": [
+								"{{products_url}}"
+							],
+							"path": [
+								"api",
+								"products",
+								"{{productId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Product",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{products_url}}/api/products/{{productId}}",
+							"host": [
+								"{{products_url}}"
+							],
+							"path": [
+								"api",
+								"products",
+								"{{productId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Category",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Wireless Audio\",\n    \"description\": \"Wireless headphones, earbuds, and speakers\",\n    \"parentId\": \"electronics-audio\",\n    \"image\": \"wireless-audio-category.jpg\",\n    \"isActive\": true,\n    \"sortOrder\": 1,\n    \"seoTitle\": \"Wireless Audio Devices | Premium Sound Quality\",\n    \"seoDescription\": \"Discover our collection of wireless audio devices including headphones, earbuds, and speakers.\"\n}"
+						},
+						"url": {
+							"raw": "{{products_url}}/api/categories",
+							"host": [
+								"{{products_url}}"
+							],
+							"path": [
+								"api",
+								"categories"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Categories",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{products_url}}/api/categories?includeSubcategories=true",
+							"host": [
+								"{{products_url}}"
+							],
+							"path": [
+								"api",
+								"categories"
+							],
+							"query": [
+								{
+									"key": "includeSubcategories",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload Product Images",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "images",
+									"type": "file",
+									"src": []
+								},
+								{
+									"key": "altTexts",
+									"value": "[\"Main product image\", \"Side view\", \"Detail view\"]",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{products_url}}/api/products/{{productId}}/images",
+							"host": [
+								"{{products_url}}"
+							],
+							"path": [
+								"api",
+								"products",
+								"{{productId}}",
+								"images"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Inventory",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"stock\": 75,\n    \"lowStockThreshold\": 10,\n    \"trackInventory\": true\n}"
+						},
+						"url": {
+							"raw": "{{products_url}}/api/products/{{productId}}/inventory",
+							"host": [
+								"{{products_url}}"
+							],
+							"path": [
+								"api",
+								"products",
+								"{{productId}}",
+								"inventory"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search Products",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{products_url}}/api/products/search?q=wireless%20headphones&category=electronics&minPrice=50&maxPrice=300&brand=AudioTech&inStock=true&sortBy=relevance&sortOrder=desc",
+							"host": [
+								"{{products_url}}"
+							],
+							"path": [
+								"api",
+								"products",
+								"search"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "wireless headphones"
+								},
+								{
+									"key": "category",
+									"value": "electronics"
+								},
+								{
+									"key": "minPrice",
+									"value": "50"
+								},
+								{
+									"key": "maxPrice",
+									"value": "300"
+								},
+								{
+									"key": "brand",
+									"value": "AudioTech"
+								},
+								{
+									"key": "inStock",
+									"value": "true"
+								},
+								{
+									"key": "sortBy",
+									"value": "relevance"
+								},
+								{
+									"key": "sortOrder",
+									"value": "desc"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "💳 Transactions Service (Port 3003)",
+			"item": [
+				{
+					"name": "Create Order",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"items\": [\n        {\n            \"productId\": \"{{productId}}\",\n            \"quantity\": 2,\n            \"unitPrice\": 299.99,\n            \"selectedOptions\": {\n                \"color\": \"Black\",\n                \"size\": \"M\"\n            }\n        }\n    ],\n    \"shippingAddress\": {\n        \"firstName\": \"John\",\n        \"lastName\": \"Doe\",\n        \"street\": \"123 Main Street\",\n        \"city\": \"Lagos\",\n        \"state\": \"Lagos\",\n        \"country\": \"Nigeria\",\n        \"postalCode\": \"100001\",\n        \"phone\": \"+234123456789\"\n    },\n    \"billingAddress\": {\n        \"firstName\": \"John\",\n        \"lastName\": \"Doe\",\n        \"street\": \"123 Main Street\",\n        \"city\": \"Lagos\",\n        \"state\": \"Lagos\",\n        \"country\": \"Nigeria\",\n        \"postalCode\": \"100001\",\n        \"phone\": \"+234123456789\"\n    },\n    \"paymentMethod\": \"card\",\n    \"shippingMethod\": \"express\",\n    \"couponCode\": \"SAVE10\",\n    \"notes\": \"Please handle with care\"\n}"
+						},
+						"url": {
+							"raw": "{{transactions_url}}/api/orders",
+							"host": [
+								"{{transactions_url}}"
+							],
+							"path": [
+								"api",
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Orders",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{transactions_url}}/api/orders?page=1&limit=10&status=pending&sortBy=createdAt&sortOrder=desc",
+							"host": [
+								"{{transactions_url}}"
+							],
+							"path": [
+								"api",
+								"orders"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "status",
+									"value": "pending"
+								},
+								{
+									"key": "sortBy",
+									"value": "createdAt"
+								},
+								{
+									"key": "sortOrder",
+									"value": "desc"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Order Details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{transactions_url}}/api/orders/{{orderId}}",
+							"host": [
+								"{{transactions_url}}"
+							],
+							"path": [
+								"api",
+								"orders",
+								"{{orderId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Order Status",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"shipped\",\n    \"trackingNumber\": \"TRK123456789\",\n    \"carrier\": \"DHL\",\n    \"notes\": \"Order has been shipped successfully\"\n}"
+						},
+						"url": {
+							"raw": "{{transactions_url}}/api/orders/{{orderId}}/status",
+							"host": [
+								"{{transactions_url}}"
+							],
+							"path": [
+								"api",
+								"orders",
+								"{{orderId}}",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Process Payment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"orderId\": \"{{orderId}}\",\n    \"paymentMethod\": \"card\",\n    \"cardDetails\": {\n        \"number\": \"4111111111111111\",\n        \"expiryMonth\": \"12\",\n        \"expiryYear\": \"2025\",\n        \"cvv\": \"123\",\n        \"holderName\": \"John Doe\"\n    },\n    \"billingAddress\": {\n        \"street\": \"123 Main Street\",\n        \"city\": \"Lagos\",\n        \"country\": \"Nigeria\",\n        \"postalCode\": \"100001\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{transactions_url}}/api/payments",
+							"host": [
+								"{{transactions_url}}"
+							],
+							"path": [
+								"api",
+								"payments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Payment Methods",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{transactions_url}}/api/payments/methods",
+							"host": [
+								"{{transactions_url}}"
+							],
+							"path": [
+								"api",
+								"payments",
+								"methods"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fund Wallet",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"amount\": 1000.00,\n    \"currency\": \"USD\",\n    \"paymentMethod\": \"card\",\n    \"description\": \"Wallet funding for purchases\"\n}"
+						},
+						"url": {
+							"raw": "{{transactions_url}}/api/wallet/deposit",
+							"host": [
+								"{{transactions_url}}"
+							],
+							"path": [
+								"api",
+								"wallet",
+								"deposit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Wallet Balance",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{transactions_url}}/api/wallet/balance",
+							"host": [
+								"{{transactions_url}}"
+							],
+							"path": [
+								"api",
+								"wallet",
+								"balance"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Withdraw from Wallet",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"amount\": 500.00,\n    \"currency\": \"USD\",\n    \"bankAccount\": {\n        \"accountNumber\": \"1234567890\",\n        \"bankCode\": \"001\",\n        \"accountName\": \"John Doe\"\n    },\n    \"description\": \"Withdrawal to bank account\"\n}"
+						},
+						"url": {
+							"raw": "{{transactions_url}}/api/wallet/withdraw",
+							"host": [
+								"{{transactions_url}}"
+							],
+							"path": [
+								"api",
+								"wallet",
+								"withdraw"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Subscription",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"planId\": \"premium-monthly\",\n    \"paymentMethod\": \"card\",\n    \"cardDetails\": {\n        \"number\": \"4111111111111111\",\n        \"expiryMonth\": \"12\",\n        \"expiryYear\": \"2025\",\n        \"cvv\": \"123\",\n        \"holderName\": \"John Doe\"\n    },\n    \"autoRenew\": true,\n    \"trialPeriodDays\": 7\n}"
+						},
+						"url": {
+							"raw": "{{transactions_url}}/api/subscriptions",
+							"host": [
+								"{{transactions_url}}"
+							],
+							"path": [
+								"api",
+								"subscriptions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Subscriptions",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{transactions_url}}/api/subscriptions?status=active",
+							"host": [
+								"{{transactions_url}}"
+							],
+							"path": [
+								"api",
+								"subscriptions"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "active"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel Subscription",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"reason\": \"No longer needed\",\n    \"cancelAtPeriodEnd\": true,\n    \"refundType\": \"prorated\"\n}"
+						},
+						"url": {
+							"raw": "{{transactions_url}}/api/subscriptions/{{subscriptionId}}/cancel",
+							"host": [
+								"{{transactions_url}}"
+							],
+							"path": [
+								"api",
+								"subscriptions",
+								"{{subscriptionId}}",
+								"cancel"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "💬 Messaging Service (Port 3004)",
+			"item": [
+				{
+					"name": "Create Conversation",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"participantIds\": [\"{{sellerId}}\", \"{{buyerId}}\"],\n    \"productId\": \"{{productId}}\",\n    \"type\": \"product_inquiry\",\n    \"title\": \"Inquiry about Wireless Headphones\",\n    \"initialMessage\": \"Hi, I'm interested in your wireless headphones. Are they available in blue?\"\n}"
+						},
+						"url": {
+							"raw": "{{messaging_url}}/api/conversations",
+							"host": [
+								"{{messaging_url}}"
+							],
+							"path": [
+								"api",
+								"conversations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Conversations",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{messaging_url}}/api/conversations?page=1&limit=20&type=product_inquiry&status=active",
+							"host": [
+								"{{messaging_url}}"
+							],
+							"path": [
+								"api",
+								"conversations"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								},
+								{
+									"key": "type",
+									"value": "product_inquiry"
+								},
+								{
+									"key": "status",
+									"value": "active"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Conversation Details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{messaging_url}}/api/conversations/{{conversationId}}",
+							"host": [
+								"{{messaging_url}}"
+							],
+							"path": [
+								"api",
+								"conversations",
+								"{{conversationId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Message",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"conversationId\": \"{{conversationId}}\",\n    \"content\": \"Yes, we have them in blue! The wireless headphones are available in black, white, and blue. Would you like me to check the current stock?\",\n    \"messageType\": \"text\",\n    \"metadata\": {\n        \"productId\": \"{{productId}}\",\n        \"urgency\": \"normal\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{messaging_url}}/api/conversations/{{conversationId}}/messages",
+							"host": [
+								"{{messaging_url}}"
+							],
+							"path": [
+								"api",
+								"conversations",
+								"{{conversationId}}",
+								"messages"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Messages",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{messaging_url}}/api/conversations/{{conversationId}}/messages?page=1&limit=50&before={{messageId}}",
+							"host": [
+								"{{messaging_url}}"
+							],
+							"path": [
+								"api",
+								"conversations",
+								"{{conversationId}}",
+								"messages"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "50"
+								},
+								{
+									"key": "before",
+									"value": "{{messageId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Mark Message as Read",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"messageIds\": [\"{{messageId}}\", \"{{messageId2}}\"],\n    \"readAt\": \"2024-01-15T10:30:00Z\"\n}"
+						},
+						"url": {
+							"raw": "{{messaging_url}}/api/messages/read",
+							"host": [
+								"{{messaging_url}}"
+							],
+							"path": [
+								"api",
+								"messages",
+								"read"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload File",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": []
+								},
+								{
+									"key": "conversationId",
+									"value": "{{conversationId}}",
+									"type": "text"
+								},
+								{
+									"key": "fileType",
+									"value": "image",
+									"type": "text"
+								},
+								{
+									"key": "caption",
+									"value": "Product specification sheet",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{messaging_url}}/api/files/upload",
+							"host": [
+								"{{messaging_url}}"
+							],
+							"path": [
+								"api",
+								"files",
+								"upload"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get File Details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{messaging_url}}/api/files/{{fileId}}",
+							"host": [
+								"{{messaging_url}}"
+							],
+							"path": [
+								"api",
+								"files",
+								"{{fileId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Archive Conversation",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"archived\": true,\n    \"archiveReason\": \"Order completed successfully\"\n}"
+						},
+						"url": {
+							"raw": "{{messaging_url}}/api/conversations/{{conversationId}}/archive",
+							"host": [
+								"{{messaging_url}}"
+							],
+							"path": [
+								"api",
+								"conversations",
+								"{{conversationId}}",
+								"archive"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "WebSocket Connection (Real-time)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "ws://{{messaging_url}}:3004?token={{accessToken}}",
+							"host": [
+								"ws://{{messaging_url}}"
+							],
+							"port": "3004",
+							"query": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}"
+								}
+							]
+						},
+						"description": "WebSocket connection for real-time messaging. Send JSON messages like: {\"type\":\"join_conversation\",\"conversationId\":\"123\"} or {\"type\":\"send_message\",\"conversationId\":\"123\",\"content\":\"Hello!\"}"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "📧 Notifications Service (Port 3005)",
+			"item": [
+				{
+					"name": "Send Email Notification",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"type\": \"email\",\n    \"recipient\": \"user@example.com\",\n    \"subject\": \"Welcome to Microservices B2B-B2C Marketplace!\",\n    \"template\": \"welcome_email\",\n    \"data\": {\n        \"userName\": \"John Doe\",\n        \"verificationLink\": \"https://marketplace.com/verify?token=abc123\",\n        \"loginLink\": \"https://marketplace.com/login\"\n    },\n    \"priority\": \"high\",\n    \"scheduledAt\": null\n}"
+						},
+						"url": {
+							"raw": "{{notifications_url}}/api/notifications/send",
+							"host": [
+								"{{notifications_url}}"
+							],
+							"path": [
+								"api",
+								"notifications",
+								"send"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send SMS Notification",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"type\": \"sms\",\n    \"recipient\": \"+1234567890\",\n    \"message\": \"Your order #12345 has been shipped! Track it here: https://marketplace.com/track/12345\",\n    \"priority\": \"normal\"\n}"
+						},
+						"url": {
+							"raw": "{{notifications_url}}/api/notifications/send",
+							"host": [
+								"{{notifications_url}}"
+							],
+							"path": [
+								"api",
+								"notifications",
+								"send"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Push Notification",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"type\": \"push\",\n    \"recipient\": \"{{userId}}\",\n    \"title\": \"New Message\",\n    \"body\": \"You have a new message from AudioTech Store\",\n    \"data\": {\n        \"conversationId\": \"{{conversationId}}\",\n        \"type\": \"message\"\n    },\n    \"priority\": \"normal\",\n    \"ttl\": 86400\n}"
+						},
+						"url": {
+							"raw": "{{notifications_url}}/api/notifications/send",
+							"host": [
+								"{{notifications_url}}"
+							],
+							"path": [
+								"api",
+								"notifications",
+								"send"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Email Template",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"order_confirmation\",\n    \"subject\": \"Order Confirmation - Order #{{orderId}}\",\n    \"htmlContent\": \"<h1>Thank you for your order!</h1><p>Order ID: {{orderId}}</p><p>Total: ${{total}}</p><p>Expected delivery: {{deliveryDate}}</p>\",\n    \"textContent\": \"Thank you for your order! Order ID: {{orderId}}, Total: ${{total}}, Expected delivery: {{deliveryDate}}\",\n    \"variables\": [\"orderId\", \"total\", \"deliveryDate\"],\n    \"category\": \"orders\",\n    \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{notifications_url}}/api/templates",
+							"host": [
+								"{{notifications_url}}"
+							],
+							"path": [
+								"api",
+								"templates"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Templates",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{notifications_url}}/api/templates?category=orders&isActive=true",
+							"host": [
+								"{{notifications_url}}"
+							],
+							"path": [
+								"api",
+								"templates"
+							],
+							"query": [
+								{
+									"key": "category",
+									"value": "orders"
+								},
+								{
+									"key": "isActive",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Template",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"subject\": \"Updated Order Confirmation - Order #{{orderId}}\",\n    \"htmlContent\": \"<h1>Your order is confirmed!</h1><p>Order ID: {{orderId}}</p><p>Status: {{status}}</p><p>Total: ${{total}}</p>\",\n    \"variables\": [\"orderId\", \"status\", \"total\"]\n}"
+						},
+						"url": {
+							"raw": "{{notifications_url}}/api/templates/order_confirmation",
+							"host": [
+								"{{notifications_url}}"
+							],
+							"path": [
+								"api",
+								"templates",
+								"order_confirmation"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Preferences",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{notifications_url}}/api/preferences",
+							"host": [
+								"{{notifications_url}}"
+							],
+							"path": [
+								"api",
+								"preferences"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Notification Preferences",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": {\n        \"order_updates\": true,\n        \"promotions\": false,\n        \"newsletter\": true,\n        \"security\": true\n    },\n    \"sms\": {\n        \"order_updates\": true,\n        \"security\": true,\n        \"promotions\": false\n    },\n    \"push\": {\n        \"messages\": true,\n        \"orders\": true,\n        \"promotions\": false,\n        \"system\": true\n    },\n    \"frequency\": {\n        \"promotions\": \"weekly\",\n        \"newsletter\": \"monthly\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{notifications_url}}/api/preferences",
+							"host": [
+								"{{notifications_url}}"
+							],
+							"path": [
+								"api",
+								"preferences"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Notification Campaign",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"New Year Sale Announcement\",\n    \"type\": \"email\",\n    \"template\": \"promotion_email\",\n    \"recipientCriteria\": {\n        \"segments\": [\"active_users\", \"high_value_customers\"],\n        \"lastPurchase\": {\n            \"operator\": \">\",\n            \"value\": \"2023-01-01\"\n        }\n    },\n    \"content\": {\n        \"subject\": \"🌟 50% Off Everything - Happy New Year!\",\n        \"data\": {\n            \"discount\": \"50%\",\n            \"validUntil\": \"2024-01-31\",\n            \"promoCode\": \"NEWYEAR50\"\n        }\n    },\n    \"schedule\": {\n        \"type\": \"scheduled\",\n        \"scheduledAt\": \"2024-01-01T00:00:00Z\"\n    },\n    \"settings\": {\n        \"trackOpens\": true,\n        \"trackClicks\": true,\n        \"respectPreferences\": true\n    }\n}"
+						},
+						"url": {
+							"raw": "{{notifications_url}}/api/campaigns",
+							"host": [
+								"{{notifications_url}}"
+							],
+							"path": [
+								"api",
+								"campaigns"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Campaigns",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{notifications_url}}/api/campaigns?status=scheduled&page=1&limit=20",
+							"host": [
+								"{{notifications_url}}"
+							],
+							"path": [
+								"api",
+								"campaigns"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "scheduled"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Campaign",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"action\": \"send_now\",\n    \"testEmail\": \"test@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{notifications_url}}/api/campaigns/{{campaignId}}/send",
+							"host": [
+								"{{notifications_url}}"
+							],
+							"path": [
+								"api",
+								"campaigns",
+								"{{campaignId}}",
+								"send"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Notification History",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{notifications_url}}/api/notifications/history?page=1&limit=50&type=email&status=delivered",
+							"host": [
+								"{{notifications_url}}"
+							],
+							"path": [
+								"api",
+								"notifications",
+								"history"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "50"
+								},
+								{
+									"key": "type",
+									"value": "email"
+								},
+								{
+									"key": "status",
+									"value": "delivered"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Delivery Statistics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{notifications_url}}/api/analytics/delivery?startDate=2024-01-01&endDate=2024-01-31&type=email",
+							"host": [
+								"{{notifications_url}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"delivery"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2024-01-31"
+								},
+								{
+									"key": "type",
+									"value": "email"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "📢 Advertising Service (Port 3006)",
+			"item": [
+				{
+					"name": "Create Campaign",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Wireless Headphones Campaign\",\n    \"description\": \"Promote premium wireless headphones to tech enthusiasts\",\n    \"type\": \"cpc\",\n    \"budget\": {\n        \"amount\": 1000.00,\n        \"currency\": \"USD\",\n        \"period\": \"daily\",\n        \"maxBid\": 2.50\n    },\n    \"targeting\": {\n        \"locations\": [\"Nigeria\", \"Ghana\", \"Kenya\"],\n        \"ageRange\": {\"min\": 18, \"max\": 45},\n        \"interests\": [\"technology\", \"audio\", \"music\"],\n        \"devices\": [\"mobile\", \"desktop\"],\n        \"retargeting\": {\n            \"visitedProductPages\": true,\n            \"addedToCart\": true,\n            \"abandonedCart\": false\n        }\n    },\n    \"creatives\": [\n        {\n            \"type\": \"image\",\n            \"title\": \"Premium Wireless Headphones\",\n            \"description\": \"Experience crystal-clear sound with noise cancellation\",\n            \"imageUrl\": \"https://cdn.marketplace.com/ads/headphones-hero.jpg\",\n            \"destinationUrl\": \"https://marketplace.com/products/wireless-headphones\",\n            \"callToAction\": \"Shop Now\"\n        }\n    ],\n    \"schedule\": {\n        \"startDate\": \"2024-01-15T00:00:00Z\",\n        \"endDate\": \"2024-02-15T23:59:59Z\",\n        \"timezone\": \"Africa/Lagos\",\n        \"daysOfWeek\": [1, 2, 3, 4, 5, 6, 7],\n        \"hoursOfDay\": {\"start\": 9, \"end\": 21}\n    },\n    \"settings\": {\n        \"status\": \"active\",\n        \"frequencyCap\": {\"impressions\": 5, \"period\": \"day\"},\n        \"trackingPixels\": [\"https://analytics.example.com/pixel.gif\"],\n        \"conversionTracking\": true\n    }\n}"
+						},
+						"url": {
+							"raw": "{{advertising_url}}/api/campaigns",
+							"host": [
+								"{{advertising_url}}"
+							],
+							"path": [
+								"api",
+								"campaigns"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Campaigns",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{advertising_url}}/api/campaigns?page=1&limit=20&status=active&sortBy=createdAt&sortOrder=desc",
+							"host": [
+								"{{advertising_url}}"
+							],
+							"path": [
+								"api",
+								"campaigns"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								},
+								{
+									"key": "status",
+									"value": "active"
+								},
+								{
+									"key": "sortBy",
+									"value": "createdAt"
+								},
+								{
+									"key": "sortOrder",
+									"value": "desc"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Campaign",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"budget\": {\n        \"amount\": 1500.00,\n        \"maxBid\": 3.00\n    },\n    \"targeting\": {\n        \"ageRange\": {\"min\": 18, \"max\": 50},\n        \"interests\": [\"technology\", \"audio\", \"music\", \"gaming\"]\n    },\n    \"settings\": {\n        \"status\": \"paused\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{advertising_url}}/api/campaigns/{{campaignId}}",
+							"host": [
+								"{{advertising_url}}"
+							],
+							"path": [
+								"api",
+								"campaigns",
+								"{{campaignId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Ad Creative",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"campaignId\": \"{{campaignId}}\",\n    \"type\": \"carousel\",\n    \"title\": \"Wireless Audio Collection\",\n    \"description\": \"Discover our complete range of wireless audio products\",\n    \"images\": [\n        {\n            \"url\": \"https://cdn.marketplace.com/ads/headphones.jpg\",\n            \"alt\": \"Wireless Headphones\"\n        },\n        {\n            \"url\": \"https://cdn.marketplace.com/ads/earbuds.jpg\",\n            \"alt\": \"Wireless Earbuds\"\n        },\n        {\n            \"url\": \"https://cdn.marketplace.com/ads/speakers.jpg\",\n            \"alt\": \"Portable Speakers\"\n        }\n    ],\n    \"destinationUrl\": \"https://marketplace.com/categories/wireless-audio\",\n    \"callToAction\": \"Explore Collection\",\n    \"tracking\": {\n        \"clickUrl\": \"https://analytics.example.com/click\",\n        \"impressionUrl\": \"https://analytics.example.com/impression\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{advertising_url}}/api/ads",
+							"host": [
+								"{{advertising_url}}"
+							],
+							"path": [
+								"api",
+								"ads"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Ad Performance",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{advertising_url}}/api/ads/{{adId}}/stats?startDate=2024-01-01&endDate=2024-01-31&groupBy=day",
+							"host": [
+								"{{advertising_url}}"
+							],
+							"path": [
+								"api",
+								"ads",
+								"{{adId}}",
+								"stats"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2024-01-31"
+								},
+								{
+									"key": "groupBy",
+									"value": "day"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Targeting Rule",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"High-Value Tech Shoppers\",\n    \"description\": \"Users who have purchased tech products over $500 in the last 90 days\",\n    \"criteria\": {\n        \"and\": [\n            {\n                \"field\": \"purchaseHistory.totalSpent\",\n                \"operator\": \">\",\n                \"value\": 500\n            },\n            {\n                \"field\": \"purchaseHistory.categories\",\n                \"operator\": \"contains\",\n                \"value\": \"electronics\"\n            },\n            {\n                \"field\": \"lastPurchaseDate\",\n                \"operator\": \">\",\n                \"value\": \"90_days_ago\"\n            },\n            {\n                \"field\": \"userProfile.location.country\",\n                \"operator\": \"in\",\n                \"value\": [\"Nigeria\", \"Ghana\", \"Kenya\", \"South Africa\"]\n            }\n        ]\n    },\n    \"estimatedSize\": 5000,\n    \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{advertising_url}}/api/targeting/rules",
+							"host": [
+								"{{advertising_url}}"
+							],
+							"path": [
+								"api",
+								"targeting",
+								"rules"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Segments",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{advertising_url}}/api/targeting/segments?page=1&limit=20&sortBy=size&sortOrder=desc",
+							"host": [
+								"{{advertising_url}}"
+							],
+							"path": [
+								"api",
+								"targeting",
+								"segments"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								},
+								{
+									"key": "sortBy",
+									"value": "size"
+								},
+								{
+									"key": "sortOrder",
+									"value": "desc"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Campaign Analytics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{advertising_url}}/api/analytics/campaigns?startDate=2024-01-01&endDate=2024-01-31&campaignId={{campaignId}}&metrics=impressions,clicks,conversions,spend,ctr,cpc,cpm,roas",
+							"host": [
+								"{{advertising_url}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"campaigns"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2024-01-31"
+								},
+								{
+									"key": "campaignId",
+									"value": "{{campaignId}}"
+								},
+								{
+									"key": "metrics",
+									"value": "impressions,clicks,conversions,spend,ctr,cpc,cpm,roas"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Pause Campaign",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"paused\",\n    \"reason\": \"Budget exhausted for this month\"\n}"
+						},
+						"url": {
+							"raw": "{{advertising_url}}/api/campaigns/{{campaignId}}/status",
+							"host": [
+								"{{advertising_url}}"
+							],
+							"path": [
+								"api",
+								"campaigns",
+								"{{campaignId}}",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Ad Auction Results",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{advertising_url}}/api/ads/auction?placement=product_page&userId={{userId}}&keywords=wireless,headphones,audio&limit=3",
+							"host": [
+								"{{advertising_url}}"
+							],
+							"path": [
+								"api",
+								"ads",
+								"auction"
+							],
+							"query": [
+								{
+									"key": "placement",
+									"value": "product_page"
+								},
+								{
+									"key": "userId",
+									"value": "{{userId}}"
+								},
+								{
+									"key": "keywords",
+									"value": "wireless,headphones,audio"
+								},
+								{
+									"key": "limit",
+									"value": "3"
+								}
+							]
+						},
+						"description": "Internal API for ad serving - called by frontend and other services to get winning ads for auction"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "🎫 Ticketing Service (Port 3007)",
+			"item": [
+				{
+					"name": "Create Support Ticket",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Cannot access my seller dashboard\",\n    \"description\": \"I am unable to log into my seller dashboard. The page keeps loading indefinitely. I have tried clearing my cache and using different browsers but the issue persists.\",\n    \"category\": \"technical_issue\",\n    \"subcategory\": \"login_access\",\n    \"priority\": \"high\",\n    \"tags\": [\"login\", \"dashboard\", \"access\", \"seller\"],\n    \"metadata\": {\n        \"browser\": \"Chrome 120.0\",\n        \"os\": \"Windows 11\",\n        \"url\": \"https://marketplace.com/seller/dashboard\",\n        \"stepsToReproduce\": [\n            \"Go to seller login page\",\n            \"Enter valid credentials\",\n            \"Click login button\",\n            \"Page shows loading spinner indefinitely\"\n        ],\n        \"expectedBehavior\": \"Should redirect to seller dashboard\",\n        \"actualBehavior\": \"Page keeps loading\",\n        \"errorMessages\": \"None displayed\",\n        \"attachments\": [\"screenshot.png\", \"console_logs.txt\"]\n    },\n    \"contactMethod\": \"email\",\n    \"preferredLanguage\": \"en\"\n}"
+						},
+						"url": {
+							"raw": "{{ticketing_url}}/api/tickets",
+							"host": [
+								"{{ticketing_url}}"
+							],
+							"path": [
+								"api",
+								"tickets"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Tickets",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{ticketing_url}}/api/tickets?page=1&limit=20&status=open&sortBy=createdAt&sortOrder=desc",
+							"host": [
+								"{{ticketing_url}}"
+							],
+							"path": [
+								"api",
+								"tickets"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								},
+								{
+									"key": "status",
+									"value": "open"
+								},
+								{
+									"key": "sortBy",
+									"value": "createdAt"
+								},
+								{
+									"key": "sortOrder",
+									"value": "desc"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Ticket Details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{ticketing_url}}/api/tickets/{{ticketId}}",
+							"host": [
+								"{{ticketing_url}}"
+							],
+							"path": [
+								"api",
+								"tickets",
+								"{{ticketId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Ticket Comment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"content\": \"Thank you for the quick response! I've tried the suggested solution and it's working now. The issue was with my browser's cache. Appreciate the help!\",\n    \"isInternal\": false,\n    \"attachments\": [],\n    \"metadata\": {\n        \"resolution\": \"user_applied_fix\",\n        \"timeSpent\": 5\n    }\n}"
+						},
+						"url": {
+							"raw": "{{ticketing_url}}/api/tickets/{{ticketId}}/comments",
+							"host": [
+								"{{ticketing_url}}"
+							],
+							"path": [
+								"api",
+								"tickets",
+								"{{ticketId}}",
+								"comments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Ticket Status",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"resolved\",\n    \"resolution\": \"Issue resolved by clearing browser cache\",\n    \"satisfactionRating\": 5,\n    \"feedback\": \"Excellent support, very quick resolution\",\n    \"closeReason\": \"solved_by_user\"\n}"
+						},
+						"url": {
+							"raw": "{{ticketing_url}}/api/tickets/{{ticketId}}/status",
+							"host": [
+								"{{ticketing_url}}"
+							],
+							"path": [
+								"api",
+								"tickets",
+								"{{ticketId}}",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Assign Agent to Ticket",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"agentId\": \"agent-uuid-123\",\n    \"assignmentReason\": \"Technical expertise in login issues\",\n    \"priorityOverride\": null,\n    \"estimatedResolutionTime\": \"2_hours\"\n}"
+						},
+						"url": {
+							"raw": "{{ticketing_url}}/api/tickets/{{ticketId}}/assign",
+							"host": [
+								"{{ticketing_url}}"
+							],
+							"path": [
+								"api",
+								"tickets",
+								"{{ticketId}}",
+								"assign"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get SLA Status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{ticketing_url}}/api/tickets/{{ticketId}}/sla",
+							"host": [
+								"{{ticketing_url}}"
+							],
+							"path": [
+								"api",
+								"tickets",
+								"{{ticketId}}",
+								"sla"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Agent Workload",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{ticketing_url}}/api/agents/{{agentId}}/workload?status=open,pending,in_progress",
+							"host": [
+								"{{ticketing_url}}"
+							],
+							"path": [
+								"api",
+								"agents",
+								"{{agentId}}",
+								"workload"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "open,pending,in_progress"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Support Categories",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{ticketing_url}}/api/categories?includeSubcategories=true&isActive=true",
+							"host": [
+								"{{ticketing_url}}"
+							],
+							"path": [
+								"api",
+								"categories"
+							],
+							"query": [
+								{
+									"key": "includeSubcategories",
+									"value": "true"
+								},
+								{
+									"key": "isActive",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create SLA Policy",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Premium Support SLA\",\n    \"description\": \"SLA for premium subscribers\",\n    \"priority\": \"high\",\n    \"responseTimeHours\": 2,\n    \"resolutionTimeHours\": 24,\n    \"escalationRules\": [\n        {\n            \"condition\": \"breached\",\n            \"action\": \"notify_manager\",\n            \"delayMinutes\": 30\n        }\n    ],\n    \"businessHours\": {\n        \"timezone\": \"Africa/Lagos\",\n        \"daysOfWeek\": [1, 2, 3, 4, 5],\n        \"hoursOfDay\": {\"start\": 9, \"end\": 17}\n    },\n    \"applicableTo\": {\n        \"userTiers\": [\"premium\", \"enterprise\"],\n        \"categories\": [\"technical_issue\", \"account_issue\"]\n    },\n    \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{ticketing_url}}/api/sla/policies",
+							"host": [
+								"{{ticketing_url}}"
+							],
+							"path": [
+								"api",
+								"sla",
+								"policies"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Support Analytics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{ticketing_url}}/api/analytics/tickets?startDate=2024-01-01&endDate=2024-01-31&metrics=created,resolved,avgResolutionTime,satisfactionScore,slaCompliance",
+							"host": [
+								"{{ticketing_url}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"tickets"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2024-01-31"
+								},
+								{
+									"key": "metrics",
+									"value": "created,resolved,avgResolutionTime,satisfactionScore,slaCompliance"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "⚙️ System Service (Port 3012)",
+			"item": [
+				{
+					"name": "Get System Health",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{system_url}}/api/health",
+							"host": [
+								"{{system_url}}"
+							],
+							"path": [
+								"api",
+								"health"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get System Configuration",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{system_url}}/api/config",
+							"host": [
+								"{{system_url}}"
+							],
+							"path": [
+								"api",
+								"config"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update System Setting",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"key\": \"app.maintenance.mode\",\n    \"value\": true,\n    \"group\": \"app\",\n    \"description\": \"Enable maintenance mode\",\n    \"isPublic\": false,\n    \"validation\": {\n        \"type\": \"boolean\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{system_url}}/api/config",
+							"host": [
+								"{{system_url}}"
+							],
+							"path": [
+								"api",
+								"config"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get System Logs",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{system_url}}/api/logs?page=1&limit=50&level=error&startDate=2024-01-01&endDate=2024-01-31",
+							"host": [
+								"{{system_url}}"
+							],
+							"path": [
+								"api",
+								"logs"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "50"
+								},
+								{
+									"key": "level",
+									"value": "error"
+								},
+								{
+									"key": "startDate",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2024-01-31"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Feature Flags",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{system_url}}/api/features",
+							"host": [
+								"{{system_url}}"
+							],
+							"path": [
+								"api",
+								"features"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Toggle Feature Flag",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"enabled\": true,\n    \"rolloutPercentage\": 25,\n    \"targetUsers\": [\"premium_users\"],\n    \"conditions\": {\n        \"userType\": \"seller\",\n        \"registrationDate\": {\n            \"operator\": \">\",\n            \"value\": \"2023-01-01\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{system_url}}/api/features/new_dashboard",
+							"host": [
+								"{{system_url}}"
+							],
+							"path": [
+								"api",
+								"features",
+								"new_dashboard"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Audit Logs",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{system_url}}/api/audit/logs?page=1&limit=50&action=user_login&startDate=2024-01-01&endDate=2024-01-31",
+							"host": [
+								"{{system_url}}"
+							],
+							"path": [
+								"api",
+								"audit",
+								"logs"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "50"
+								},
+								{
+									"key": "action",
+									"value": "user_login"
+								},
+								{
+									"key": "startDate",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2024-01-31"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Service Health Status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{system_url}}/api/health/services",
+							"host": [
+								"{{system_url}}"
+							],
+							"path": [
+								"api",
+								"health",
+								"services"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create System Backup",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"type\": \"full\",\n    \"includeData\": true,\n    \"includeFiles\": true,\n    \"compression\": \"gzip\",\n    \"retentionDays\": 30,\n    \"description\": \"Monthly full backup\",\n    \"notifyOnCompletion\": true\n}"
+						},
+						"url": {
+							"raw": "{{system_url}}/api/backup/create",
+							"host": [
+								"{{system_url}}"
+							],
+							"path": [
+								"api",
+								"backup",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Backup History",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{system_url}}/api/backup/history?page=1&limit=20&status=completed",
+							"host": [
+								"{{system_url}}"
+							],
+							"path": [
+								"api",
+								"backup",
+								"history"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								},
+								{
+									"key": "status",
+									"value": "completed"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get System Metrics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{system_url}}/api/metrics/system?startDate=2024-01-01&endDate=2024-01-31&metrics=cpu,memory,disk,requests,errors",
+							"host": [
+								"{{system_url}}"
+							],
+							"path": [
+								"api",
+								"metrics",
+								"system"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2024-01-31"
+								},
+								{
+									"key": "metrics",
+									"value": "cpu,memory,disk,requests,errors"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "📊 Analytics Service (Port 3013)",
+			"item": [
+				{
+					"name": "Get Dashboard Data",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{analytics_url}}/api/analytics/dashboard?period=30d&metrics=revenue,orders,users,conversion",
+							"host": [
+								"{{analytics_url}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"dashboard"
+							],
+							"query": [
+								{
+									"key": "period",
+									"value": "30d"
+								},
+								{
+									"key": "metrics",
+									"value": "revenue,orders,users,conversion"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Sales Report",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{analytics_url}}/api/analytics/sales?startDate=2024-01-01&endDate=2024-01-31&groupBy=day&includeRefunds=true",
+							"host": [
+								"{{analytics_url}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"sales"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2024-01-31"
+								},
+								{
+									"key": "groupBy",
+									"value": "day"
+								},
+								{
+									"key": "includeRefunds",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Analytics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{analytics_url}}/api/analytics/users?startDate=2024-01-01&endDate=2024-01-31&metrics=registrations,active_users,churn_rate,retention",
+							"host": [
+								"{{analytics_url}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"users"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2024-01-31"
+								},
+								{
+									"key": "metrics",
+									"value": "registrations,active_users,churn_rate,retention"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Custom Dashboard",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Seller Performance Dashboard\",\n    \"description\": \"Track key performance metrics for sellers\",\n    \"widgets\": [\n        {\n            \"type\": \"metric\",\n            \"title\": \"Total Sales\",\n            \"metric\": \"revenue\",\n            \"period\": \"30d\",\n            \"position\": {\"x\": 0, \"y\": 0, \"w\": 6, \"h\": 4}\n        },\n        {\n            \"type\": \"chart\",\n            \"title\": \"Sales Trend\",\n            \"chartType\": \"line\",\n            \"dataSource\": \"sales\",\n            \"period\": \"90d\",\n            \"position\": {\"x\": 6, \"y\": 0, \"w\": 6, \"h\": 4}\n        },\n        {\n            \"type\": \"metric\",\n            \"title\": \"Active Listings\",\n            \"metric\": \"products_active\",\n            \"position\": {\"x\": 0, \"y\": 4, \"w\": 3, \"h\": 2}\n        },\n        {\n            \"type\": \"metric\",\n            \"title\": \"Average Rating\",\n            \"metric\": \"rating_average\",\n            \"position\": {\"x\": 3, \"y\": 4, \"w\": 3, \"h\": 2}\n        }\n    ],\n    \"isPublic\": false,\n    \"refreshInterval\": 300,\n    \"filters\": {\n        \"userType\": \"seller\",\n        \"dateRange\": \"last_30_days\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{analytics_url}}/api/dashboards",
+							"host": [
+								"{{analytics_url}}"
+							],
+							"path": [
+								"api",
+								"dashboards"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Dashboards",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{analytics_url}}/api/dashboards?type=custom&sortBy=createdAt&sortOrder=desc",
+							"host": [
+								"{{analytics_url}}"
+							],
+							"path": [
+								"api",
+								"dashboards"
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": "custom"
+								},
+								{
+									"key": "sortBy",
+									"value": "createdAt"
+								},
+								{
+									"key": "sortOrder",
+									"value": "desc"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Report",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Monthly Sales Report\",\n    \"description\": \"Comprehensive monthly sales performance report\",\n    \"type\": \"scheduled\",\n    \"format\": \"pdf\",\n    \"schedule\": {\n        \"frequency\": \"monthly\",\n        \"dayOfMonth\": 1,\n        \"time\": \"09:00\",\n        \"timezone\": \"Africa/Lagos\"\n    },\n    \"recipients\": [\n        \"manager@company.com\",\n        \"finance@company.com\"\n    ],\n    \"sections\": [\n        {\n            \"title\": \"Executive Summary\",\n            \"type\": \"summary\",\n            \"metrics\": [\"total_revenue\", \"total_orders\", \"avg_order_value\"]\n        },\n        {\n            \"title\": \"Sales Breakdown\",\n            \"type\": \"chart\",\n            \"chartType\": \"bar\",\n            \"dataSource\": \"sales_by_category\",\n            \"period\": \"monthly\"\n        },\n        {\n            \"title\": \"Top Products\",\n            \"type\": \"table\",\n            \"dataSource\": \"products_performance\",\n            \"limit\": 10,\n            \"sortBy\": \"revenue\",\n            \"sortOrder\": \"desc\"\n        }\n    ],\n    \"filters\": {\n        \"dateRange\": \"last_month\",\n        \"includeRefunds\": false\n    },\n    \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{analytics_url}}/api/reports",
+							"host": [
+								"{{analytics_url}}"
+							],
+							"path": [
+								"api",
+								"reports"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Reports",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{analytics_url}}/api/reports?type=scheduled&status=active&page=1&limit=20",
+							"host": [
+								"{{analytics_url}}"
+							],
+							"path": [
+								"api",
+								"reports"
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": "scheduled"
+								},
+								{
+									"key": "status",
+									"value": "active"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Generate Report",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"startDate\": \"2024-01-01\",\n    \"endDate\": \"2024-01-31\",\n    \"includeCharts\": true,\n    \"includeRawData\": false,\n    \"emailReport\": true\n}"
+						},
+						"url": {
+							"raw": "{{analytics_url}}/api/reports/{{reportId}}/generate",
+							"host": [
+								"{{analytics_url}}"
+							],
+							"path": [
+								"api",
+								"reports",
+								"{{reportId}}",
+								"generate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Alert",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Revenue Drop Alert\",\n    \"description\": \"Alert when daily revenue drops by more than 20%\",\n    \"metric\": \"revenue\",\n    \"condition\": {\n        \"operator\": \"decrease_percentage\",\n        \"threshold\": 20,\n        \"period\": \"day\",\n        \"comparisonPeriod\": \"previous_day\"\n    },\n    \"channels\": [\n        {\n            \"type\": \"email\",\n            \"recipients\": [\"manager@company.com\"],\n            \"template\": \"revenue_alert\"\n        },\n        {\n            \"type\": \"slack\",\n            \"webhookUrl\": \"https://hooks.slack.com/...\",\n            \"channel\": \"#alerts\"\n        }\n    ],\n    \"cooldownMinutes\": 60,\n    \"isActive\": true,\n    \"severity\": \"high\"\n}"
+						},
+						"url": {
+							"raw": "{{analytics_url}}/api/alerts",
+							"host": [
+								"{{analytics_url}}"
+							],
+							"path": [
+								"api",
+								"alerts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Real-time Metrics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{analytics_url}}/api/metrics/realtime?metrics=user_activity,orders_created,revenue&lastMinutes=60",
+							"host": [
+								"{{analytics_url}}"
+							],
+							"path": [
+								"api",
+								"metrics",
+								"realtime"
+							],
+							"query": [
+								{
+									"key": "metrics",
+									"value": "user_activity,orders_created,revenue"
+								},
+								{
+									"key": "lastMinutes",
+									"value": "60"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "🚚 Shipping Service (Port 3010)",
+			"item": [
+				{
+					"name": "Calculate Shipping Rates",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"origin\": {\n        \"address\": \"123 Warehouse St, Lagos, Nigeria\",\n        \"coordinates\": {\"lat\": 6.5244, \"lng\": 3.3792}\n    },\n    \"destination\": {\n        \"address\": \"456 Customer Ave, Abuja, Nigeria\",\n        \"coordinates\": {\"lat\": 9.0765, \"lng\": 7.3986}\n    },\n    \"package\": {\n        \"weight\": 2.5,\n        \"dimensions\": {\n            \"length\": 30,\n            \"width\": 20,\n            \"height\": 15\n        },\n        \"value\": 299.99,\n        \"description\": \"Wireless Headphones\",\n        \"isFragile\": false,\n        \"requiresRefrigeration\": false\n    },\n    \"serviceType\": \"express\",\n    \"insurance\": true,\n    \"signatureRequired\": true\n}"
+						},
+						"url": {
+							"raw": "{{shipping_url}}/api/shipping/rates",
+							"host": [
+								"{{shipping_url}}"
+							],
+							"path": [
+								"api",
+								"shipping",
+								"rates"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Shipment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"orderId\": \"{{orderId}}\",\n    \"carrier\": \"DHL\",\n    \"serviceType\": \"express\",\n    \"sender\": {\n        \"name\": \"AudioTech Store\",\n        \"company\": \"AudioTech Ltd\",\n        \"address\": \"123 Warehouse St, Lagos, Nigeria\",\n        \"phone\": \"+234123456789\",\n        \"email\": \"shipping@audiotech.com\"\n    },\n    \"recipient\": {\n        \"name\": \"John Doe\",\n        \"address\": \"456 Customer Ave, Abuja, Nigeria\",\n        \"phone\": \"+234987654321\",\n        \"email\": \"john.doe@example.com\"\n    },\n    \"package\": {\n        \"weight\": 2.5,\n        \"dimensions\": {\"length\": 30, \"width\": 20, \"height\": 15},\n        \"description\": \"Wireless Headphones x1\",\n        \"value\": 299.99,\n        \"quantity\": 1\n    },\n    \"options\": {\n        \"insurance\": true,\n        \"signatureRequired\": true,\n        \"saturdayDelivery\": false\n    },\n    \"references\": {\n        \"customerReference\": \"CUST-12345\",\n        \"invoiceNumber\": \"INV-2024-001\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{shipping_url}}/api/shipping/shipments",
+							"host": [
+								"{{shipping_url}}"
+							],
+							"path": [
+								"api",
+								"shipping",
+								"shipments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Track Shipment",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{shipping_url}}/api/shipping/track/{{trackingNumber}}",
+							"host": [
+								"{{shipping_url}}"
+							],
+							"path": [
+								"api",
+								"shipping",
+								"track",
+								"{{trackingNumber}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Shipments",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{shipping_url}}/api/shipping/shipments?page=1&limit=20&status=in_transit&startDate=2024-01-01&endDate=2024-01-31",
+							"host": [
+								"{{shipping_url}}"
+							],
+							"path": [
+								"api",
+								"shipping",
+								"shipments"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								},
+								{
+									"key": "status",
+									"value": "in_transit"
+								},
+								{
+									"key": "startDate",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2024-01-31"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register Delivery Partner",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"companyName\": \"FastDelivery Nigeria\",\n    \"contactPerson\": \"Adebayo Johnson\",\n    \"phone\": \"+2348031234567\",\n    \"email\": \"contact@fastdelivery.ng\",\n    \"businessType\": \"logistics\",\n    \"registrationNumber\": \"RC123456\",\n    \"taxId\": \"TIN789012\",\n    \"serviceAreas\": [\n        \"Lagos\",\n        \"Abuja\",\n        \"Port Harcourt\",\n        \"Kano\"\n    ],\n    \"vehicleTypes\": [\n        \"motorcycle\",\n        \"van\",\n        \"truck\"\n    ],\n    \"insuranceCoverage\": 50000,\n    \"operatingHours\": {\n        \"start\": \"06:00\",\n        \"end\": \"22:00\",\n        \"timezone\": \"Africa/Lagos\"\n    },\n    \"bankingInfo\": {\n        \"accountNumber\": \"1234567890\",\n        \"bankCode\": \"001\",\n        \"accountName\": \"FastDelivery Nigeria Ltd\"\n    },\n    \"documents\": [\n        \"business_registration.pdf\",\n        \"insurance_certificate.pdf\",\n        \"vehicle_registration.pdf\"\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{shipping_url}}/api/shipping/partners/register",
+							"host": [
+								"{{shipping_url}}"
+							],
+							"path": [
+								"api",
+								"shipping",
+								"partners",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Delivery Partners",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{shipping_url}}/api/shipping/partners?location=Lagos&vehicleType=motorcycle&isActive=true&rating=4.5",
+							"host": [
+								"{{shipping_url}}"
+							],
+							"path": [
+								"api",
+								"shipping",
+								"partners"
+							],
+							"query": [
+								{
+									"key": "location",
+									"value": "Lagos"
+								},
+								{
+									"key": "vehicleType",
+									"value": "motorcycle"
+								},
+								{
+									"key": "isActive",
+									"value": "true"
+								},
+								{
+									"key": "rating",
+									"value": "4.5"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request Delivery",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"orderId\": \"{{orderId}}\",\n    \"pickupAddress\": {\n        \"street\": \"123 Warehouse Street\",\n        \"city\": \"Lagos\",\n        \"state\": \"Lagos\",\n        \"country\": \"Nigeria\",\n        \"postalCode\": \"100001\",\n        \"coordinates\": {\"lat\": 6.5244, \"lng\": 3.3792},\n        \"contactName\": \"Warehouse Manager\",\n        \"contactPhone\": \"+2348031234567\"\n    },\n    \"deliveryAddress\": {\n        \"street\": \"456 Customer Avenue\",\n        \"city\": \"Abuja\",\n        \"state\": \"FCT\",\n        \"country\": \"Nigeria\",\n        \"postalCode\": \"900001\",\n        \"coordinates\": {\"lat\": 9.0765, \"lng\": 7.3986},\n        \"contactName\": \"John Doe\",\n        \"contactPhone\": \"+2348037654321\"\n    },\n    \"packageDetails\": {\n        \"description\": \"Wireless Headphones x1\",\n        \"weight\": 2.5,\n        \"dimensions\": {\"length\": 30, \"width\": 20, \"height\": 15},\n        \"value\": 299.99,\n        \"isFragile\": true,\n        \"requiresSignature\": true,\n        \"specialInstructions\": \"Handle with care - electronics\"\n    },\n    \"serviceType\": \"express\",\n    \"priority\": \"high\",\n    \"scheduledPickup\": \"2024-01-15T14:00:00Z\",\n    \"estimatedDelivery\": \"2024-01-16T12:00:00Z\"\n}"
+						},
+						"url": {
+							"raw": "{{shipping_url}}/api/shipping/delivery/request",
+							"host": [
+								"{{shipping_url}}"
+							],
+							"path": [
+								"api",
+								"shipping",
+								"delivery",
+								"request"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Validate Address",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"address\": {\n        \"street\": \"456 Customer Avenue, Wuse 2\",\n        \"city\": \"Abuja\",\n        \"state\": \"FCT\",\n        \"country\": \"Nigeria\",\n        \"postalCode\": \"900001\"\n    },\n    \"validateCoordinates\": true,\n    \"checkDeliverability\": true\n}"
+						},
+						"url": {
+							"raw": "{{shipping_url}}/api/addresses/validate",
+							"host": [
+								"{{shipping_url}}"
+							],
+							"path": [
+								"api",
+								"addresses",
+								"validate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Shipping Analytics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{shipping_url}}/api/analytics/shipping?startDate=2024-01-01&endDate=2024-01-31&metrics=on_time_delivery,average_delivery_time,customer_satisfaction,shipping_costs",
+							"host": [
+								"{{shipping_url}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"shipping"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2024-01-31"
+								},
+								{
+									"key": "metrics",
+									"value": "on_time_delivery,average_delivery_time,customer_satisfaction,shipping_costs"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "🤖 AI Recommender Service (Port 3011)",
+			"item": [
+				{
+					"name": "Get Product Recommendations",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{recommender_url}}/api/recommendations/{{userId}}?limit=10&strategy=hybrid&context=viewing_product&excludePurchased=true",
+							"host": [
+								"{{recommender_url}}"
+							],
+							"path": [
+								"api",
+								"recommendations",
+								"{{userId}}"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "strategy",
+									"value": "hybrid"
+								},
+								{
+									"key": "context",
+									"value": "viewing_product"
+								},
+								{
+									"key": "excludePurchased",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Similar Products",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{recommender_url}}/api/recommendations/similar/{{productId}}?limit=8&similarity=content_based",
+							"host": [
+								"{{recommender_url}}"
+							],
+							"path": [
+								"api",
+								"recommendations",
+								"similar",
+								"{{productId}}"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "8"
+								},
+								{
+									"key": "similarity",
+									"value": "content_based"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Trending Products",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{recommender_url}}/api/recommendations/trending?category=electronics&timeframe=7d&limit=20",
+							"host": [
+								"{{recommender_url}}"
+							],
+							"path": [
+								"api",
+								"recommendations",
+								"trending"
+							],
+							"query": [
+								{
+									"key": "category",
+									"value": "electronics"
+								},
+								{
+									"key": "timeframe",
+									"value": "7d"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Train Recommendation Model",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"modelType\": \"collaborative_filtering\",\n    \"trainingData\": {\n        \"startDate\": \"2024-01-01\",\n        \"endDate\": \"2024-01-31\",\n        \"includeImplicitFeedback\": true,\n        \"minInteractionsPerUser\": 5\n    },\n    \"hyperparameters\": {\n        \"learningRate\": 0.01,\n        \"regularization\": 0.1,\n        \"factors\": 50,\n        \"iterations\": 100\n    },\n    \"validationSplit\": 0.2,\n    \"crossValidationFolds\": 5\n}"
+						},
+						"url": {
+							"raw": "{{recommender_url}}/api/models/train",
+							"host": [
+								"{{recommender_url}}"
+							],
+							"path": [
+								"api",
+								"models",
+								"train"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Model Performance",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{recommender_url}}/api/models/{{modelId}}/performance?metrics=precision,recall,ndcg,coverage",
+							"host": [
+								"{{recommender_url}}"
+							],
+							"path": [
+								"api",
+								"models",
+								"{{modelId}}",
+								"performance"
+							],
+							"query": [
+								{
+									"key": "metrics",
+									"value": "precision,recall,ndcg,coverage"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send User Feedback",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": \"{{userId}}\",\n    \"productId\": \"{{productId}}\",\n    \"recommendationId\": \"rec-123\",\n    \"feedbackType\": \"click\",\n    \"rating\": 4,\n    \"context\": {\n        \"page\": \"product_detail\",\n        \"position\": 3,\n        \"strategy\": \"collaborative_filtering\"\n    },\n    \"timestamp\": \"2024-01-15T10:30:00Z\"\n}"
+						},
+						"url": {
+							"raw": "{{recommender_url}}/api/feedback",
+							"host": [
+								"{{recommender_url}}"
+							],
+							"path": [
+								"api",
+								"feedback"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Personalized Feed",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{recommender_url}}/api/personalize/{{userId}}/feed?page=1&limit=20&contentTypes=products,reviews,articles",
+							"host": [
+								"{{recommender_url}}"
+							],
+							"path": [
+								"api",
+								"personalize",
+								"{{userId}}",
+								"feed"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								},
+								{
+									"key": "contentTypes",
+									"value": "products,reviews,articles"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "A/B Test Recommendations",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Homepage Recommendations Test\",\n    \"description\": \"Compare collaborative vs content-based recommendations\",\n    \"variants\": [\n        {\n            \"name\": \"collaborative_filtering\",\n            \"strategy\": \"collaborative_filtering\",\n            \"weight\": 50\n        },\n        {\n            \"name\": \"content_based\",\n            \"strategy\": \"content_based\",\n            \"weight\": 50\n        }\n    ],\n    \"targeting\": {\n        \"userSegments\": [\"new_users\", \"returning_users\"],\n        \"trafficPercentage\": 10\n    },\n    \"metrics\": [\n        \"click_through_rate\",\n        \"conversion_rate\",\n        \"time_spent\",\n        \"bounce_rate\"\n    ],\n    \"duration\": {\n        \"startDate\": \"2024-01-15\",\n        \"endDate\": \"2024-02-15\",\n        \"minSampleSize\": 1000\n    },\n    \"statisticalSignificance\": 0.95\n}"
+						},
+						"url": {
+							"raw": "{{recommender_url}}/api/experiments",
+							"host": [
+								"{{recommender_url}}"
+							],
+							"path": [
+								"api",
+								"experiments"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "❤️ Wishlist Service (Port 3014)",
+			"item": [
+				{
+					"name": "Create Wishlist",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Electronics Wishlist\",\n    \"description\": \"My favorite electronics and gadgets\",\n    \"isPublic\": false,\n    \"category\": \"electronics\",\n    \"tags\": [\"gadgets\", \"tech\", \"audio\"],\n    \"color\": \"#3498db\",\n    \"icon\": \"electronics\"\n}"
+						},
+						"url": {
+							"raw": "{{wishlist_url}}/api/wishlists",
+							"host": [
+								"{{wishlist_url}}"
+							],
+							"path": [
+								"api",
+								"wishlists"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Wishlists",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{wishlist_url}}/api/wishlists?page=1&limit=20&sortBy=updatedAt&sortOrder=desc",
+							"host": [
+								"{{wishlist_url}}"
+							],
+							"path": [
+								"api",
+								"wishlists"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								},
+								{
+									"key": "sortBy",
+									"value": "updatedAt"
+								},
+								{
+									"key": "sortOrder",
+									"value": "desc"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Item to Wishlist",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"productId\": \"{{productId}}\",\n    \"notes\": \"Planning to buy this for my birthday\",\n    \"priority\": \"high\",\n    \"reminderDate\": \"2024-02-15\",\n    \"targetPrice\": 250.00\n}"
+						},
+						"url": {
+							"raw": "{{wishlist_url}}/api/wishlists/{{wishlistId}}/items",
+							"host": [
+								"{{wishlist_url}}"
+							],
+							"path": [
+								"api",
+								"wishlists",
+								"{{wishlistId}}",
+								"items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Wishlist Items",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{wishlist_url}}/api/wishlists/{{wishlistId}}/items?page=1&limit=50&sortBy=addedAt&sortOrder=desc&inStock=true",
+							"host": [
+								"{{wishlist_url}}"
+							],
+							"path": [
+								"api",
+								"wishlists",
+								"{{wishlistId}}",
+								"items"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "50"
+								},
+								{
+									"key": "sortBy",
+									"value": "addedAt"
+								},
+								{
+									"key": "sortOrder",
+									"value": "desc"
+								},
+								{
+									"key": "inStock",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Price Alert",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"productId\": \"{{productId}}\",\n    \"targetPrice\": 250.00,\n    \"alertType\": \"price_drop\",\n    \"frequency\": \"immediate\",\n    \"channels\": [\"email\", \"push\"],\n    \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{wishlist_url}}/api/alerts/price",
+							"host": [
+								"{{wishlist_url}}"
+							],
+							"path": [
+								"api",
+								"alerts",
+								"price"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Price Alerts",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{wishlist_url}}/api/alerts/price?page=1&limit=20&status=active&sortBy=createdAt&sortOrder=desc",
+							"host": [
+								"{{wishlist_url}}"
+							],
+							"path": [
+								"api",
+								"alerts",
+								"price"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								},
+								{
+									"key": "status",
+									"value": "active"
+								},
+								{
+									"key": "sortBy",
+									"value": "createdAt"
+								},
+								{
+									"key": "sortOrder",
+									"value": "desc"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Share Wishlist",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"wishlistId\": \"{{wishlistId}}\",\n    \"shareType\": \"public_link\",\n    \"expiresAt\": \"2024-02-15T23:59:59Z\",\n    \"allowComments\": true,\n    \"allowDuplicates\": false,\n    \"message\": \"Check out my electronics wishlist!\",\n    \"recipients\": [\n        \"friend1@example.com\",\n        \"friend2@example.com\"\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{wishlist_url}}/api/wishlists/{{wishlistId}}/share",
+							"host": [
+								"{{wishlist_url}}"
+							],
+							"path": [
+								"api",
+								"wishlists",
+								"{{wishlistId}}",
+								"share"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Shared Wishlist",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{wishlist_url}}/api/wishlists/shared/{{shareId}}",
+							"host": [
+								"{{wishlist_url}}"
+							],
+							"path": [
+								"api",
+								"wishlists",
+								"shared",
+								"{{shareId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Duplicate Wishlist",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"sourceWishlistId\": \"{{sourceWishlistId}}\",\n    \"name\": \"Copy of Electronics Wishlist\",\n    \"description\": \"Duplicated wishlist for backup\",\n    \"isPublic\": false\n}"
+						},
+						"url": {
+							"raw": "{{wishlist_url}}/api/wishlists/duplicate",
+							"host": [
+								"{{wishlist_url}}"
+							],
+							"path": [
+								"api",
+								"wishlists",
+								"duplicate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Wishlist Analytics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{wishlist_url}}/api/analytics/wishlists?startDate=2024-01-01&endDate=2024-01-31&metrics=views,conversions,engagement,price_alerts",
+							"host": [
+								"{{wishlist_url}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"wishlists"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2024-01-31"
+								},
+								{
+									"key": "metrics",
+									"value": "views,conversions,engagement,price_alerts"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "🔍 Search Service (Port 3015)",
+			"item": [
+				{
+					"name": "Search Products",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{search_url}}/api/search?q=wireless%20headphones&page=1&limit=20&sort=relevance&filters={\"category\":\"electronics\",\"price\":{\"min\":50,\"max\":500},\"brand\":\"AudioTech\",\"rating\":{\"min\":4},\"inStock\":true}",
+							"host": [
+								"{{search_url}}"
+							],
+							"path": [
+								"api",
+								"search"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "wireless headphones"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								},
+								{
+									"key": "sort",
+									"value": "relevance"
+								},
+								{
+									"key": "filters",
+									"value": "{\"category\":\"electronics\",\"price\":{\"min\":50,\"max\":500},\"brand\":\"AudioTech\",\"rating\":{\"min\":4},\"inStock\":true}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Autocomplete Suggestions",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{search_url}}/api/search/autocomplete?q=wire&limit=10&type=product",
+							"host": [
+								"{{search_url}}"
+							],
+							"path": [
+								"api",
+								"search",
+								"autocomplete"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "wire"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "type",
+									"value": "product"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Search Suggestions",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{search_url}}/api/search/suggestions?context=user_search_history&limit=8",
+							"host": [
+								"{{search_url}}"
+							],
+							"path": [
+								"api",
+								"search",
+								"suggestions"
+							],
+							"query": [
+								{
+									"key": "context",
+									"value": "user_search_history"
+								},
+								{
+									"key": "limit",
+									"value": "8"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Index Product",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"productId\": \"{{productId}}\",\n    \"indexType\": \"full\",\n    \"priority\": \"high\",\n    \"forceReindex\": false\n}"
+						},
+						"url": {
+							"raw": "{{search_url}}/api/index/product",
+							"host": [
+								"{{search_url}}"
+							],
+							"path": [
+								"api",
+								"index",
+								"product"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Product Index",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"fields\": {\n        \"name\": \"Updated Wireless Headphones\",\n        \"price\": 279.99,\n        \"stock\": 45,\n        \"category\": \"electronics-audio\",\n        \"tags\": [\"wireless\", \"bluetooth\", \"headphones\", \"updated\"]\n    },\n    \"reindexRelated\": true\n}"
+						},
+						"url": {
+							"raw": "{{search_url}}/api/index/product/{{productId}}",
+							"host": [
+								"{{search_url}}"
+							],
+							"path": [
+								"api",
+								"index",
+								"product",
+								"{{productId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove Product from Index",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{search_url}}/api/index/product/{{productId}}",
+							"host": [
+								"{{search_url}}"
+							],
+							"path": [
+								"api",
+								"index",
+								"product",
+								"{{productId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Bulk Index Products",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"productIds\": [\n        \"prod-001\",\n        \"prod-002\",\n        \"prod-003\"\n    ],\n    \"indexType\": \"incremental\",\n    \"batchSize\": 100,\n    \"priority\": \"normal\",\n    \"schedule\": {\n        \"type\": \"immediate\",\n        \"notifyOnCompletion\": true\n    }\n}"
+						},
+						"url": {
+							"raw": "{{search_url}}/api/index/bulk",
+							"host": [
+								"{{search_url}}"
+							],
+							"path": [
+								"api",
+								"index",
+								"bulk"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Search Analytics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{search_url}}/api/analytics/searches?startDate=2024-01-01&endDate=2024-01-31&metrics=search_volume,zero_results_rate,avg_click_position,conversion_rate",
+							"host": [
+								"{{search_url}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"searches"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2024-01-31"
+								},
+								{
+									"key": "metrics",
+									"value": "search_volume,zero_results_rate,avg_click_position,conversion_rate"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Popular Queries",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{search_url}}/api/analytics/queries?period=7d&limit=50&minVolume=10&sortBy=volume&sortOrder=desc",
+							"host": [
+								"{{search_url}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"queries"
+							],
+							"query": [
+								{
+									"key": "period",
+									"value": "7d"
+								},
+								{
+									"key": "limit",
+									"value": "50"
+								},
+								{
+									"key": "minVolume",
+									"value": "10"
+								},
+								{
+									"key": "sortBy",
+									"value": "volume"
+								},
+								{
+									"key": "sortOrder",
+									"value": "desc"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Search Filter",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Premium Electronics\",\n    \"description\": \"High-end electronics with premium features\",\n    \"criteria\": {\n        \"and\": [\n            {\n                \"field\": \"category\",\n                \"operator\": \"in\",\n                \"value\": [\"electronics\", \"audio\"]\n            },\n            {\n                \"field\": \"price\",\n                \"operator\": \">=\",\n                \"value\": 100\n            },\n            {\n                \"field\": \"rating\",\n                \"operator\": \">=\",\n                \"value\": 4.5\n            },\n            {\n                \"field\": \"brand\",\n                \"operator\": \"in\",\n                \"value\": [\"AudioTech\", \"TechPro\", \"SoundMax\"]\n            }\n        ]\n    },\n    \"isPublic\": true,\n    \"tags\": [\"premium\", \"electronics\", \"audio\"]\n}"
+						},
+						"url": {
+							"raw": "{{search_url}}/api/filters",
+							"host": [
+								"{{search_url}}"
+							],
+							"path": [
+								"api",
+								"filters"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "🚀 SEO Service (Port 3016)",
+			"item": [
+				{
+					"name": "Get SEO Meta Data",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{seo_url}}/api/seo/meta?entityType=product&entityId={{productId}}&platform=google",
+							"host": [
+								"{{seo_url}}"
+							],
+							"path": [
+								"api",
+								"seo",
+								"meta"
+							],
+							"query": [
+								{
+									"key": "entityType",
+									"value": "product"
+								},
+								{
+									"key": "entityId",
+									"value": "{{productId}}"
+								},
+								{
+									"key": "platform",
+									"value": "google"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update SEO Meta Data",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Premium Wireless Bluetooth Headphones - AudioTech\",\n    \"description\": \"Experience crystal-clear sound with our premium wireless Bluetooth headphones featuring active noise cancellation, 30-hour battery life, and superior comfort.\",\n    \"keywords\": [\n        \"wireless headphones\",\n        \"bluetooth headphones\",\n        \"noise cancelling headphones\",\n        \"premium audio\",\n        \"AudioTech\"\n    ],\n    \"canonicalUrl\": \"https://marketplace.com/products/wireless-headphones\",\n    \"openGraph\": {\n        \"title\": \"Premium Wireless Bluetooth Headphones\",\n        \"description\": \"Crystal-clear sound with active noise cancellation\",\n        \"image\": \"https://cdn.marketplace.com/products/headphones-hero.jpg\",\n        \"type\": \"product\",\n        \"siteName\": \"Microservices B2B-B2C Marketplace\"\n    },\n    \"twitterCard\": {\n        \"card\": \"summary_large_image\",\n        \"title\": \"Premium Wireless Bluetooth Headphones\",\n        \"description\": \"Crystal-clear sound with active noise cancellation\",\n        \"image\": \"https://cdn.marketplace.com/products/headphones-twitter.jpg\"\n    },\n    \"structuredData\": {\n        \"@context\": \"https://schema.org\",\n        \"@type\": \"Product\",\n        \"name\": \"Wireless Bluetooth Headphones\",\n        \"description\": \"Premium wireless headphones with noise cancellation\",\n        \"brand\": {\n            \"@type\": \"Brand\",\n            \"name\": \"AudioTech\"\n        },\n        \"offers\": {\n            \"@type\": \"Offer\",\n            \"price\": \"299.99\",\n            \"priceCurrency\": \"USD\",\n            \"availability\": \"https://schema.org/InStock\",\n            \"seller\": {\n                \"@type\": \"Organization\",\n                \"name\": \"AudioTech Store\"\n            }\n        },\n        \"aggregateRating\": {\n            \"@type\": \"AggregateRating\",\n            \"ratingValue\": \"4.5\",\n            \"reviewCount\": \"127\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{seo_url}}/api/seo/meta?entityType=product&entityId={{productId}}",
+							"host": [
+								"{{seo_url}}"
+							],
+							"path": [
+								"api",
+								"seo",
+								"meta"
+							],
+							"query": [
+								{
+									"key": "entityType",
+									"value": "product"
+								},
+								{
+									"key": "entityId",
+									"value": "{{productId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Sitemap",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{seo_url}}/sitemap.xml",
+							"host": [
+								"{{seo_url}}"
+							],
+							"path": [
+								"sitemap.xml"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Sitemap Index",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{seo_url}}/sitemaps/products.xml",
+							"host": [
+								"{{seo_url}}"
+							],
+							"path": [
+								"sitemaps",
+								"products.xml"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Robots.txt",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{seo_url}}/robots.txt",
+							"host": [
+								"{{seo_url}}"
+							],
+							"path": [
+								"robots.txt"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Redirect",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"sourceUrl\": \"/old-product-url\",\n    \"targetUrl\": \"/products/wireless-headphones\",\n    \"redirectType\": 301,\n    \"isActive\": true,\n    \"notes\": \"Product URL changed due to SEO optimization\"\n}"
+						},
+						"url": {
+							"raw": "{{seo_url}}/api/redirects",
+							"host": [
+								"{{seo_url}}"
+							],
+							"path": [
+								"api",
+								"redirects"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Redirects",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{seo_url}}/api/redirects?page=1&limit=50&isActive=true&sortBy=createdAt&sortOrder=desc",
+							"host": [
+								"{{seo_url}}"
+							],
+							"path": [
+								"api",
+								"redirects"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "50"
+								},
+								{
+									"key": "isActive",
+									"value": "true"
+								},
+								{
+									"key": "sortBy",
+									"value": "createdAt"
+								},
+								{
+									"key": "sortOrder",
+									"value": "desc"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Redirect",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"targetUrl\": \"/products/new-wireless-headphones\",\n    \"redirectType\": 302,\n    \"notes\": \"Temporary redirect for product update\"\n}"
+						},
+						"url": {
+							"raw": "{{seo_url}}/api/redirects/{{redirectId}}",
+							"host": [
+								"{{seo_url}}"
+							],
+							"path": [
+								"api",
+								"redirects",
+								"{{redirectId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Redirect",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{seo_url}}/api/redirects/{{redirectId}}",
+							"host": [
+								"{{seo_url}}"
+							],
+							"path": [
+								"api",
+								"redirects",
+								"{{redirectId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Generate Sitemaps",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"entityTypes\": [\"products\", \"categories\", \"sellers\"],\n    \"includeImages\": true,\n    \"includeLastModified\": true,\n    \"priorityCalculation\": \"dynamic\",\n    \"changeFrequency\": \"weekly\",\n    \"maxUrlsPerSitemap\": 50000,\n    \"compressSitemaps\": true,\n    \"submitToSearchEngines\": true\n}"
+						},
+						"url": {
+							"raw": "{{seo_url}}/api/admin/generate-sitemaps",
+							"host": [
+								"{{seo_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"generate-sitemaps"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get SEO Analytics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{seo_url}}/api/analytics/seo?startDate=2024-01-01&endDate=2024-01-31&metrics=organic_traffic,rankings,backlinks,indexed_pages,click_through_rate",
+							"host": [
+								"{{seo_url}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"seo"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2024-01-31"
+								},
+								{
+									"key": "metrics",
+									"value": "organic_traffic,rankings,backlinks,indexed_pages,click_through_rate"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Search Console Data",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{seo_url}}/api/analytics/search-console?startDate=2024-01-01&endDate=2024-01-31&dimensions=query,page,country,device",
+							"host": [
+								"{{seo_url}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"search-console"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2024-01-31"
+								},
+								{
+									"key": "dimensions",
+									"value": "query,page,country,device"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "💎 Loyalty Service (Port 3017)",
+			"item": [
+				{
+					"name": "Get Loyalty Account",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{loyalty_url}}/api/loyalty/account/{{userId}}",
+							"host": [
+								"{{loyalty_url}}"
+							],
+							"path": [
+								"api",
+								"loyalty",
+								"account",
+								"{{userId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Award Points",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": \"{{userId}}\",\n    \"points\": 150,\n    \"transactionType\": \"earned\",\n    \"referenceType\": \"purchase\",\n    \"referenceId\": \"{{orderId}}\",\n    \"description\": \"Points for order completion\",\n    \"expiresAt\": \"2025-01-15T23:59:59Z\",\n    \"metadata\": {\n        \"orderValue\": 299.99,\n        \"category\": \"electronics\",\n        \"multiplier\": 1.0\n    }\n}"
+						},
+						"url": {
+							"raw": "{{loyalty_url}}/api/loyalty/points/award",
+							"host": [
+								"{{loyalty_url}}"
+							],
+							"path": [
+								"api",
+								"loyalty",
+								"points",
+								"award"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Redeem Points",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": \"{{userId}}\",\n    \"points\": 500,\n    \"rewardType\": \"discount\",\n    \"rewardValue\": 50.00,\n    \"description\": \"$50 discount redemption\",\n    \"expiresAt\": \"2024-02-15T23:59:59Z\",\n    \"conditions\": {\n        \"minOrderValue\": 100.00,\n        \"categories\": [\"electronics\", \"books\"],\n        \"exclusions\": [\"sale_items\"]\n    }\n}"
+						},
+						"url": {
+							"raw": "{{loyalty_url}}/api/loyalty/points/redeem",
+							"host": [
+								"{{loyalty_url}}"
+							],
+							"path": [
+								"api",
+								"loyalty",
+								"points",
+								"redeem"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Points History",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{loyalty_url}}/api/loyalty/points/history?page=1&limit=50&transactionType=earned&startDate=2024-01-01&endDate=2024-01-31",
+							"host": [
+								"{{loyalty_url}}"
+							],
+							"path": [
+								"api",
+								"loyalty",
+								"points",
+								"history"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "50"
+								},
+								{
+									"key": "transactionType",
+									"value": "earned"
+								},
+								{
+									"key": "startDate",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2024-01-31"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Reward Catalog",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{loyalty_url}}/api/loyalty/rewards?page=1&limit=20&category=discount&minPoints=100&maxPoints=1000&isActive=true",
+							"host": [
+								"{{loyalty_url}}"
+							],
+							"path": [
+								"api",
+								"loyalty",
+								"rewards"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								},
+								{
+									"key": "category",
+									"value": "discount"
+								},
+								{
+									"key": "minPoints",
+									"value": "100"
+								},
+								{
+									"key": "maxPoints",
+									"value": "1000"
+								},
+								{
+									"key": "isActive",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Redeem Reward",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"rewardId\": \"{{rewardId}}\",\n    \"userId\": \"{{userId}}\",\n    \"quantity\": 1,\n    \"notes\": \"Redeeming for upcoming purchase\"\n}"
+						},
+						"url": {
+							"raw": "{{loyalty_url}}/api/loyalty/rewards/redeem",
+							"host": [
+								"{{loyalty_url}}"
+							],
+							"path": [
+								"api",
+								"loyalty",
+								"rewards",
+								"redeem"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Tiers",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{loyalty_url}}/api/loyalty/tiers",
+							"host": [
+								"{{loyalty_url}}"
+							],
+							"path": [
+								"api",
+								"loyalty",
+								"tiers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Tier Status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{loyalty_url}}/api/loyalty/tiers/{{userId}}",
+							"host": [
+								"{{loyalty_url}}"
+							],
+							"path": [
+								"api",
+								"loyalty",
+								"tiers",
+								"{{userId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Referral",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"referrerId\": \"{{userId}}\",\n    \"refereeEmail\": \"friend@example.com\",\n    \"refereeName\": \"John Doe\",\n    \"message\": \"Join Microservices B2B-B2C Marketplace and get rewards! Use my referral link.\",\n    \"rewardAmount\": 500,\n    \"expiresAt\": \"2024-02-15T23:59:59Z\",\n    \"maxUses\": 1\n}"
+						},
+						"url": {
+							"raw": "{{loyalty_url}}/api/loyalty/referrals",
+							"host": [
+								"{{loyalty_url}}"
+							],
+							"path": [
+								"api",
+								"loyalty",
+								"referrals"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Referrals",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{loyalty_url}}/api/loyalty/referrals/{{userId}}?status=completed&page=1&limit=20",
+							"host": [
+								"{{loyalty_url}}"
+							],
+							"path": [
+								"api",
+								"loyalty",
+								"referrals",
+								"{{userId}}"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "completed"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Loyalty Analytics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{loyalty_url}}/api/analytics/loyalty?startDate=2024-01-01&endDate=2024-01-31&metrics=points_issued,points_redeemed,active_members,redemption_rate,referral_conversions",
+							"host": [
+								"{{loyalty_url}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"loyalty"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2024-01-31"
+								},
+								{
+									"key": "metrics",
+									"value": "points_issued,points_redeemed,active_members,redemption_rate,referral_conversions"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "🌟 Social Features Service (Port 3018)",
+			"item": [
+				{
+					"name": "Follow User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{social_url}}/api/social/follow/{{sellerId}}",
+							"host": [
+								"{{social_url}}"
+							],
+							"path": [
+								"api",
+								"social",
+								"follow",
+								"{{sellerId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Unfollow User",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{social_url}}/api/social/follow/{{sellerId}}",
+							"host": [
+								"{{social_url}}"
+							],
+							"path": [
+								"api",
+								"social",
+								"follow",
+								"{{sellerId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Following List",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{social_url}}/api/social/following/{{userId}}?page=1&limit=20",
+							"host": [
+								"{{social_url}}"
+							],
+							"path": [
+								"api",
+								"social",
+								"following",
+								"{{userId}}"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Followers List",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{social_url}}/api/social/followers/{{userId}}?page=1&limit=20",
+							"host": [
+								"{{social_url}}"
+							],
+							"path": [
+								"api",
+								"social",
+								"followers",
+								"{{userId}}"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Social Post",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"content\": \"Just discovered these amazing wireless headphones! Perfect sound quality and noise cancellation. Highly recommend for anyone looking for premium audio gear. 🎧✨ #AudioTech #WirelessAudio #TechReview\",\n    \"productId\": \"{{productId}}\",\n    \"mediaUrls\": [\n        \"https://cdn.marketplace.com/posts/headphones-review.jpg\",\n        \"https://cdn.marketplace.com/posts/headphones-demo.mp4\"\n    ],\n    \"visibility\": \"public\",\n    \"tags\": [\"headphones\", \"audio\", \"review\", \"recommendation\"],\n    \"location\": {\n        \"name\": \"Lagos, Nigeria\",\n        \"coordinates\": {\"lat\": 6.5244, \"lng\": 3.3792}\n    },\n    \"mood\": \"excited\",\n    \"allowComments\": true,\n    \"allowShares\": true\n}"
+						},
+						"url": {
+							"raw": "{{social_url}}/api/social/posts",
+							"host": [
+								"{{social_url}}"
+							],
+							"path": [
+								"api",
+								"social",
+								"posts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Feed",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{social_url}}/api/social/feed/{{userId}}?page=1&limit=20&includeOwnPosts=true&sortBy=engagement",
+							"host": [
+								"{{social_url}}"
+							],
+							"path": [
+								"api",
+								"social",
+								"feed",
+								"{{userId}}"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								},
+								{
+									"key": "includeOwnPosts",
+									"value": "true"
+								},
+								{
+									"key": "sortBy",
+									"value": "engagement"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Discovery Feed",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{social_url}}/api/social/feed/discover?page=1&limit=20&contentTypes=products,reviews,posts&interests=technology,audio,gaming",
+							"host": [
+								"{{social_url}}"
+							],
+							"path": [
+								"api",
+								"social",
+								"feed",
+								"discover"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								},
+								{
+									"key": "contentTypes",
+									"value": "products,reviews,posts"
+								},
+								{
+									"key": "interests",
+									"value": "technology,audio,gaming"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Like Post",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"reactionType\": \"like\",\n    \"intensity\": \"high\"\n}"
+						},
+						"url": {
+							"raw": "{{social_url}}/api/social/posts/{{postId}}/react",
+							"host": [
+								"{{social_url}}"
+							],
+							"path": [
+								"api",
+								"social",
+								"posts",
+								"{{postId}}",
+								"react"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Comment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"content\": \"Great review! I've been looking for good wireless headphones. Do they work well with calls too?\",\n    \"parentCommentId\": null,\n    \"mediaUrls\": [],\n    \"mentions\": [\"@audiotech_support\"],\n    \"sentiment\": \"positive\"\n}"
+						},
+						"url": {
+							"raw": "{{social_url}}/api/social/posts/{{postId}}/comments",
+							"host": [
+								"{{social_url}}"
+							],
+							"path": [
+								"api",
+								"social",
+								"posts",
+								"{{postId}}",
+								"comments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Share Product",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"productId\": \"{{productId}}\",\n    \"platforms\": [\"facebook\", \"twitter\", \"instagram\"],\n    \"message\": \"Check out these amazing wireless headphones! Perfect for music lovers. 🎧 #TechGadgets #Audio\",\n    \"hashtags\": [\"wireless\", \"headphones\", \"audio\", \"tech\"],\n    \"scheduledAt\": null,\n    \"targetAudience\": \"tech_enthusiasts\"\n}"
+						},
+						"url": {
+							"raw": "{{social_url}}/api/social/share",
+							"host": [
+								"{{social_url}}"
+							],
+							"path": [
+								"api",
+								"social",
+								"share"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Social Analytics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{social_url}}/api/analytics/social?startDate=2024-01-01&endDate=2024-01-31&metrics=engagement_rate,reach,shares,followers_gained,sentiment_score",
+							"host": [
+								"{{social_url}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"social"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2024-01-31"
+								},
+								{
+									"key": "metrics",
+									"value": "engagement_rate,reach,shares,followers_gained,sentiment_score"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "📊 Enhanced Analytics Service (Port 3019)",
+			"item": [
+				{
+					"name": "Predict Customer Churn",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{enhanced_analytics_url}}/api/predict/churn/{{userId}}",
+							"host": [
+								"{{enhanced_analytics_url}}"
+							],
+							"path": [
+								"api",
+								"predict",
+								"churn",
+								"{{userId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Predict Purchase Likelihood",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{enhanced_analytics_url}}/api/predict/purchase/{{userId}}/{{productId}}",
+							"host": [
+								"{{enhanced_analytics_url}}"
+							],
+							"path": [
+								"api",
+								"predict",
+								"purchase",
+								"{{userId}}",
+								"{{productId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Calculate Recommendation Score",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{enhanced_analytics_url}}/api/predict/recommendation/{{userId}}/{{productId}}",
+							"host": [
+								"{{enhanced_analytics_url}}"
+							],
+							"path": [
+								"api",
+								"predict",
+								"recommendation",
+								"{{userId}}",
+								"{{productId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Optimize Product Price",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{enhanced_analytics_url}}/api/optimize/price/{{productId}}",
+							"host": [
+								"{{enhanced_analytics_url}}"
+							],
+							"path": [
+								"api",
+								"optimize",
+								"price",
+								"{{productId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Predictive Model",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"modelName\": \"Customer Churn Predictor v2\",\n    \"modelType\": \"customer_churn\",\n    \"algorithm\": \"gradient_boosting\",\n    \"description\": \"Advanced churn prediction using ensemble methods\",\n    \"hyperparameters\": {\n        \"n_estimators\": 100,\n        \"learning_rate\": 0.1,\n        \"max_depth\": 6,\n        \"min_samples_split\": 20\n    },\n    \"trainingConfig\": {\n        \"features\": [\n            \"purchase_frequency\",\n            \"avg_order_value\",\n            \"days_since_last_purchase\",\n            \"total_orders\",\n            \"customer_age\",\n            \"product_categories\"\n        ],\n        \"target\": \"churned\",\n        \"trainTestSplit\": 0.8,\n        \"crossValidationFolds\": 5\n    },\n    \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{enhanced_analytics_url}}/api/models",
+							"host": [
+								"{{enhanced_analytics_url}}"
+							],
+							"path": [
+								"api",
+								"models"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Train Model",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{enhanced_analytics_url}}/api/models/{{modelId}}/train",
+							"host": [
+								"{{enhanced_analytics_url}}"
+							],
+							"path": [
+								"api",
+								"models",
+								"{{modelId}}",
+								"train"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Model Performance",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{enhanced_analytics_url}}/api/models/{{modelId}}/performance?metrics=accuracy,precision,recall,f1_score,auc_roc",
+							"host": [
+								"{{enhanced_analytics_url}}"
+							],
+							"path": [
+								"api",
+								"models",
+								"{{modelId}}",
+								"performance"
+							],
+							"query": [
+								{
+									"key": "metrics",
+									"value": "accuracy,precision,recall,f1_score,auc_roc"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Cohort",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"cohortName\": \"High-Value Tech Buyers Q1 2024\",\n    \"cohortType\": \"behavior_based\",\n    \"startDate\": \"2024-01-01\",\n    \"endDate\": \"2024-03-31\",\n    \"segmentCriteria\": {\n        \"and\": [\n            {\n                \"field\": \"total_spent\",\n                \"operator\": \">\",\n                \"value\": 500\n            },\n            {\n                \"field\": \"categories_purchased\",\n                \"operator\": \"contains\",\n                \"value\": \"electronics\"\n            },\n            {\n                \"field\": \"registration_date\",\n                \"operator\": \"between\",\n                \"value\": [\"2024-01-01\", \"2024-03-31\"]\n            },\n            {\n                \"field\": \"avg_rating_given\",\n                \"operator\": \">=\",\n                \"value\": 4.0\n            }\n        ]\n    },\n    \"description\": \"Customers who spent over $500 on electronics in Q1 2024 with high satisfaction ratings\"\n}"
+						},
+						"url": {
+							"raw": "{{enhanced_analytics_url}}/api/cohorts",
+							"host": [
+								"{{enhanced_analytics_url}}"
+							],
+							"path": [
+								"api",
+								"cohorts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Cohorts",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{enhanced_analytics_url}}/api/cohorts?page=1&limit=20&type=behavior_based&sortBy=user_count&sortOrder=desc",
+							"host": [
+								"{{enhanced_analytics_url}}"
+							],
+							"path": [
+								"api",
+								"cohorts"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								},
+								{
+									"key": "type",
+									"value": "behavior_based"
+								},
+								{
+									"key": "sortBy",
+									"value": "user_count"
+								},
+								{
+									"key": "sortOrder",
+									"value": "desc"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Dashboard",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"dashboardName\": \"Executive Overview Dashboard\",\n    \"description\": \"Key performance indicators for executive decision making\",\n    \"layoutConfig\": {\n        \"columns\": 12,\n        \"margin\": [10, 10],\n        \"rowHeight\": 30\n    },\n    \"widgetsConfig\": [\n        {\n            \"id\": \"revenue_chart\",\n            \"type\": \"line_chart\",\n            \"title\": \"Revenue Trend\",\n            \"dataSource\": \"revenue_metrics\",\n            \"position\": {\"x\": 0, \"y\": 0, \"w\": 8, \"h\": 6},\n            \"config\": {\n                \"period\": \"30d\",\n                \"groupBy\": \"day\",\n                \"showTrend\": true\n            }\n        },\n        {\n            \"id\": \"user_metrics\",\n            \"type\": \"metric_cards\",\n            \"title\": \"User Metrics\",\n            \"position\": {\"x\": 8, \"y\": 0, \"w\": 4, \"h\": 6},\n            \"config\": {\n                \"metrics\": [\"active_users\", \"new_registrations\", \"retention_rate\"]\n            }\n        },\n        {\n            \"id\": \"top_products\",\n            \"type\": \"table\",\n            \"title\": \"Top Performing Products\",\n            \"dataSource\": \"product_performance\",\n            \"position\": {\"x\": 0, \"y\": 6, \"w\": 6, \"h\": 6},\n            \"config\": {\n                \"limit\": 10,\n                \"sortBy\": \"revenue\",\n                \"columns\": [\"name\", \"revenue\", \"orders\", \"rating\"]\n            }\n        },\n        {\n            \"id\": \"conversion_funnel\",\n            \"type\": \"funnel_chart\",\n            \"title\": \"Conversion Funnel\",\n            \"position\": {\"x\": 6, \"y\": 6, \"w\": 6, \"h\": 6},\n            \"config\": {\n                \"stages\": [\"visitors\", \"add_to_cart\", \"checkout\", \"purchase\"]\n            }\n        }\n    ],\n    \"isPublic\": false,\n    \"refreshInterval\": 300,\n    \"filters\": {\n        \"dateRange\": \"last_30_days\",\n        \"compareWith\": \"previous_period\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{enhanced_analytics_url}}/api/dashboards",
+							"host": [
+								"{{enhanced_analytics_url}}"
+							],
+							"path": [
+								"api",
+								"dashboards"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Business Overview",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{enhanced_analytics_url}}/api/analytics/business-overview",
+							"host": [
+								"{{enhanced_analytics_url}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"business-overview"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Cross-Service Report",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{enhanced_analytics_url}}/api/analytics/cross-service-report?start_date=2024-01-01&end_date=2024-01-31&includeCharts=true",
+							"host": [
+								"{{enhanced_analytics_url}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"cross-service-report"
+							],
+							"query": [
+								{
+									"key": "start_date",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "end_date",
+									"value": "2024-01-31"
+								},
+								{
+									"key": "includeCharts",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Behavior Analysis",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{enhanced_analytics_url}}/api/analytics/user-behavior/{{userId}}",
+							"host": [
+								"{{enhanced_analytics_url}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"user-behavior",
+								"{{userId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "🎫 Promotions Service (Port 3009)",
+			"item": [
+				{
+					"name": "Create Coupon",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"code\": \"WELCOME20\",\n    \"name\": \"Welcome Discount\",\n    \"description\": \"20% off for new customers\",\n    \"type\": \"percentage\",\n    \"value\": 20,\n    \"maxDiscount\": 50.00,\n    \"minOrderValue\": 100.00,\n    \"usageLimit\": 1000,\n    \"usageLimitPerUser\": 1,\n    \"startDate\": \"2024-01-01T00:00:00Z\",\n    \"endDate\": \"2024-12-31T23:59:59Z\",\n    \"applicableCategories\": [\"electronics\", \"books\", \"clothing\"],\n    \"applicableProducts\": [],\n    \"excludedProducts\": [],\n    \"eligibleUserTypes\": [\"new_customers\"],\n    \"isActive\": true,\n    \"autoApply\": false\n}"
+						},
+						"url": {
+							"raw": "{{promotions_url}}/api/coupons",
+							"host": [
+								"{{promotions_url}}"
+							],
+							"path": [
+								"api",
+								"coupons"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Validate Coupon",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"code\": \"WELCOME20\",\n    \"userId\": \"{{userId}}\",\n    \"orderValue\": 299.99,\n    \"items\": [\n        {\n            \"productId\": \"{{productId}}\",\n            \"category\": \"electronics\",\n            \"quantity\": 1,\n            \"unitPrice\": 299.99\n        }\n    ],\n    \"userType\": \"new_customer\",\n    \"firstPurchase\": true\n}"
+						},
+						"url": {
+							"raw": "{{promotions_url}}/api/coupons/validate",
+							"host": [
+								"{{promotions_url}}"
+							],
+							"path": [
+								"api",
+								"coupons",
+								"validate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Flash Sale",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Lightning Deal - 50% Off Electronics\",\n    \"description\": \"Limited time offer on premium electronics\",\n    \"discountType\": \"percentage\",\n    \"discountValue\": 50,\n    \"maxDiscount\": 500.00,\n    \"startDate\": \"2024-01-15T12:00:00Z\",\n    \"endDate\": \"2024-01-15T18:00:00Z\",\n    \"targetProducts\": [\"{{productId}}\", \"electronics-001\"],\n    \"targetCategories\": [\"electronics\"],\n    \"maxQuantityPerUser\": 2,\n    \"totalQuantity\": 100,\n    \"minOrderValue\": 0,\n    \"eligibleUserTypes\": [\"all\"],\n    \"isActive\": true,\n    \"autoApply\": true,\n    \"priority\": 10\n}"
+						},
+						"url": {
+							"raw": "{{promotions_url}}/api/flash-sales",
+							"host": [
+								"{{promotions_url}}"
+							],
+							"path": [
+								"api",
+								"flash-sales"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Campaign",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Holiday Season Promotion\",\n    \"description\": \"Comprehensive holiday promotion campaign\",\n    \"type\": \"seasonal\",\n    \"startDate\": \"2024-12-01T00:00:00Z\",\n    \"endDate\": \"2024-12-31T23:59:59Z\",\n    \"budget\": 10000.00,\n    \"targetAudience\": {\n        \"segments\": [\"high_value_customers\", \"returning_users\"],\n        \"minOrderHistory\": 3,\n        \"avgOrderValue\": {\"min\": 150}\n    },\n    \"promotions\": [\n        {\n            \"type\": \"coupon\",\n            \"code\": \"HOLIDAY25\",\n            \"discount\": {\"type\": \"percentage\", \"value\": 25},\n            \"maxUses\": 1000\n        },\n        {\n            \"type\": \"free_shipping\",\n            \"minOrderValue\": 200,\n            \"message\": \"Free shipping on orders over $200\"\n        },\n        {\n            \"type\": \"bogo\",\n            \"buyProduct\": \"electronics-001\",\n            \"getProduct\": \"accessories-001\",\n            \"discount\": 100\n        }\n    ],\n    \"channels\": [\"website\", \"email\", \"sms\"],\n    \"tracking\": {\n        \"utm_source\": \"holiday_campaign\",\n        \"conversion_goals\": [\"purchase\", \"registration\"]\n    },\n    \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{promotions_url}}/api/campaigns",
+							"host": [
+								"{{promotions_url}}"
+							],
+							"path": [
+								"api",
+								"campaigns"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Active Promotions",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{promotions_url}}/api/promotions/active?userId={{userId}}&cartValue=299.99&categories=electronics",
+							"host": [
+								"{{promotions_url}}"
+							],
+							"path": [
+								"api",
+								"promotions",
+								"active"
+							],
+							"query": [
+								{
+									"key": "userId",
+									"value": "{{userId}}"
+								},
+								{
+									"key": "cartValue",
+									"value": "299.99"
+								},
+								{
+									"key": "categories",
+									"value": "electronics"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Campaign Performance",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{promotions_url}}/api/analytics/campaigns?startDate=2024-01-01&endDate=2024-01-31&metrics=redemption_rate,avg_discount,total_revenue,incremental_revenue,roi",
+							"host": [
+								"{{promotions_url}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"campaigns"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2024-01-31"
+								},
+								{
+									"key": "metrics",
+									"value": "redemption_rate,avg_discount,total_revenue,incremental_revenue,roi"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "⭐ Reviews Service (Port 3008)",
+			"item": [
+				{
+					"name": "Submit Product Review",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"productId\": \"{{productId}}\",\n    \"orderId\": \"{{orderId}}\",\n    \"rating\": 5,\n    \"title\": \"Exceptional Quality and Performance\",\n    \"content\": \"I've been using these wireless headphones for a month now and I'm thoroughly impressed. The sound quality is crystal clear with deep bass and balanced highs. The noise cancellation works amazingly well in noisy environments. Battery life exceeds the advertised 30 hours - I've been getting closer to 35 hours. The build quality feels premium and comfortable for extended wear. Only minor complaint is that the touch controls can be a bit sensitive at times. Overall, excellent value for money and highly recommended!\",\n    \"pros\": [\n        \"Superior sound quality\",\n        \"Effective noise cancellation\",\n        \"Long battery life\",\n        \"Comfortable fit\",\n        \"Premium build quality\"\n    ],\n    \"cons\": [\n        \"Touch controls can be sensitive\"\n    ],\n    \"recommendToFriend\": true,\n    \"verifiedPurchase\": true,\n    \"images\": [\n        \"review-image-1.jpg\",\n        \"review-image-2.jpg\"\n    ],\n    \"helpful\": 0,\n    \"notHelpful\": 0\n}"
+						},
+						"url": {
+							"raw": "{{reviews_url}}/api/reviews",
+							"host": [
+								"{{reviews_url}}"
+							],
+							"path": [
+								"api",
+								"reviews"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Product Reviews",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{reviews_url}}/api/products/{{productId}}/reviews?page=1&limit=20&sortBy=helpful&sortOrder=desc&verifiedOnly=false&minRating=0",
+							"host": [
+								"{{reviews_url}}"
+							],
+							"path": [
+								"api",
+								"products",
+								"{{productId}}",
+								"reviews"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								},
+								{
+									"key": "sortBy",
+									"value": "helpful"
+								},
+								{
+									"key": "sortOrder",
+									"value": "desc"
+								},
+								{
+									"key": "verifiedOnly",
+									"value": "false"
+								},
+								{
+									"key": "minRating",
+									"value": "0"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Mark Review Helpful",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"helpful\": true,\n    \"reason\": \"Detailed and honest review\"\n}"
+						},
+						"url": {
+							"raw": "{{reviews_url}}/api/reviews/{{reviewId}}/helpful",
+							"host": [
+								"{{reviews_url}}"
+							],
+							"path": [
+								"api",
+								"reviews",
+								"{{reviewId}}",
+								"helpful"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Report Review",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"reason\": \"inappropriate_content\",\n    \"description\": \"Review contains offensive language and personal attacks\",\n    \"evidence\": [\"screenshot1.png\"],\n    \"severity\": \"high\"\n}"
+						},
+						"url": {
+							"raw": "{{reviews_url}}/api/reviews/{{reviewId}}/flag",
+							"host": [
+								"{{reviews_url}}"
+							],
+							"path": [
+								"api",
+								"reviews",
+								"{{reviewId}}",
+								"flag"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Moderate Review",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"action\": \"approve\",\n    \"moderatorNotes\": \"Content is appropriate and adds value to product evaluation\",\n    \"autoModerated\": false,\n    \"moderationReason\": \"meets_community_guidelines\"\n}"
+						},
+						"url": {
+							"raw": "{{reviews_url}}/api/reviews/{{reviewId}}/moderate",
+							"host": [
+								"{{reviews_url}}"
+							],
+							"path": [
+								"api",
+								"reviews",
+								"{{reviewId}}",
+								"moderate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Review Analytics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{reviews_url}}/api/analytics/reviews?startDate=2024-01-01&endDate=2024-01-31&metrics=avg_rating,total_reviews,helpful_percentage,sentiment_score,moderation_stats",
+							"host": [
+								"{{reviews_url}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"reviews"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2024-01-31"
+								},
+								{
+									"key": "metrics",
+									"value": "avg_rating,total_reviews,helpful_percentage,sentiment_score,moderation_stats"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "💬 WebSocket Connections",
+			"item": [
+				{
+					"name": "Messaging WebSocket",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "ws://{{messaging_url}}:3004?token={{accessToken}}",
+							"host": [
+								"ws://{{messaging_url}}"
+							],
+							"port": "3004",
+							"query": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}"
+								}
+							]
+						},
+						"description": "WebSocket connection for real-time messaging. Use these message formats:\n\n1. Join conversation:\n{\n  \"type\": \"join_conversation\",\n  \"conversationId\": \"conv-123\",\n  \"userId\": \"{{userId}}\"\n}\n\n2. Send message:\n{\n  \"type\": \"send_message\",\n  \"conversationId\": \"conv-123\",\n  \"content\": \"Hello!\",\n  \"messageType\": \"text\"\n}\n\n3. Typing indicator:\n{\n  \"type\": \"typing_start\",\n  \"conversationId\": \"conv-123\"\n}\n\n4. Mark as read:\n{\n  \"type\": \"mark_read\",\n  \"conversationId\": \"conv-123\",\n  \"messageIds\": [\"msg-456\"]\n}"
+					},
+					"response": []
+				},
+				{
+					"name": "Analytics Real-time WebSocket",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "ws://{{analytics_url}}:3013?token={{accessToken}}",
+							"host": [
+								"ws://{{analytics_url}}"
+							],
+							"port": "3013",
+							"query": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}"
+								}
+							]
+						},
+						"description": "WebSocket connection for real-time analytics updates. Subscribe to metrics:\n\n{\n  \"type\": \"subscribe\",\n  \"metrics\": [\"revenue\", \"orders\", \"users\"],\n  \"updateInterval\": 30\n}\n\nUnsubscribe:\n{\n  \"type\": \"unsubscribe\",\n  \"metrics\": [\"revenue\"]\n}"
+					},
+					"response": []
+				},
+				{
+					"name": "Notifications WebSocket",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "ws://{{notifications_url}}:3005?token={{accessToken}}",
+							"host": [
+								"ws://{{notifications_url}}"
+							],
+							"port": "3005",
+							"query": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}"
+								}
+							]
+						},
+						"description": "WebSocket connection for real-time notifications. Automatically receives push notifications, no manual subscription needed."
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{accessToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Global pre-request script",
+					"// Add timestamp to all requests",
+					"pm.request.headers.add({",
+					"    key: 'X-Request-Timestamp',",
+					"    value: new Date().toISOString()",
+					"});",
+					"",
+					"// Add request ID for tracing",
+					"pm.request.headers.add({",
+					"    key: 'X-Request-ID',",
+					"    value: 'req-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9)",
+					"});"
+				],
+				"type": "text/javascript"
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Global test script",
+					"// Check for common response patterns",
+					"pm.test('Response has success field', function () {",
+					"    var jsonData = pm.response.json();",
+					"    if (jsonData && typeof jsonData.success !== 'undefined') {",
+					"        pm.expect(jsonData.success).to.be.true;",
+					"    }",
+					"});",
+					"",
+					"pm.test('Response time is less than 2000ms', function () {",
+					"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+					"});",
+					"",
+					"pm.test('Status code is not 5xx', function () {",
+					"    pm.expect(pm.response.code).to.not.be.oneOf([500, 501, 502, 503, 504, 505]);",
+					"});"
+				],
+				"type": "text/javascript"
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "gateway_url",
+			"value": "http://localhost:4000",
+			"type": "string",
+			"description": "API Gateway base URL"
+		},
+		{
+			"key": "auth_url",
+			"value": "http://localhost:3001",
+			"type": "string",
+			"description": "Authentication Service URL"
+		},
+		{
+			"key": "products_url",
+			"value": "http://localhost:3002",
+			"type": "string",
+			"description": "Products Service URL"
+		},
+		{
+			"key": "transactions_url",
+			"value": "http://localhost:3003",
+			"type": "string",
+			"description": "Transactions Service URL"
+		},
+		{
+			"key": "messaging_url",
+			"value": "http://localhost:3004",
+			"type": "string",
+			"description": "Messaging Service URL"
+		},
+		{
+			"key": "notifications_url",
+			"value": "http://localhost:3005",
+			"type": "string",
+			"description": "Notifications Service URL"
+		},
+		{
+			"key": "advertising_url",
+			"value": "http://localhost:3006",
+			"type": "string",
+			"description": "Advertising Service URL"
+		},
+		{
+			"key": "ticketing_url",
+			"value": "http://localhost:3007",
+			"type": "string",
+			"description": "Ticketing Service URL"
+		},
+		{
+			"key": "reviews_url",
+			"value": "http://localhost:3008",
+			"type": "string",
+			"description": "Reviews Service URL"
+		},
+		{
+			"key": "promotions_url",
+			"value": "http://localhost:3009",
+			"type": "string",
+			"description": "Promotions Service URL"
+		},
+		{
+			"key": "shipping_url",
+			"value": "http://localhost:3010",
+			"type": "string",
+			"description": "Shipping Service URL"
+		},
+		{
+			"key": "recommender_url",
+			"value": "http://localhost:3011",
+			"type": "string",
+			"description": "AI Recommender Service URL"
+		},
+		{
+			"key": "system_url",
+			"value": "http://localhost:3012",
+			"type": "string",
+			"description": "System Service URL"
+		},
+		{
+			"key": "analytics_url",
+			"value": "http://localhost:3013",
+			"type": "string",
+			"description": "Analytics Service URL"
+		},
+		{
+			"key": "wishlist_url",
+			"value": "http://localhost:3014",
+			"type": "string",
+			"description": "Wishlist Service URL"
+		},
+		{
+			"key": "search_url",
+			"value": "http://localhost:3015",
+			"type": "string",
+			"description": "Search Service URL"
+		},
+		{
+			"key": "seo_url",
+			"value": "http://localhost:3016",
+			"type": "string",
+			"description": "SEO Service URL"
+		},
+		{
+			"key": "loyalty_url",
+			"value": "http://localhost:3017",
+			"type": "string",
+			"description": "Loyalty Service URL"
+		},
+		{
+			"key": "social_url",
+			"value": "http://localhost:3018",
+			"type": "string",
+			"description": "Social Features Service URL"
+		},
+		{
+			"key": "enhanced_analytics_url",
+			"value": "http://localhost:3019",
+			"type": "string",
+			"description": "Enhanced Analytics Service URL"
+		},
+		{
+			"key": "accessToken",
+			"value": "",
+			"type": "string",
+			"description": "JWT access token from authentication"
+		},
+		{
+			"key": "refreshToken",
+			"value": "",
+			"type": "string",
+			"description": "JWT refresh token from authentication"
+		},
+		{
+			"key": "userId",
+			"value": "",
+			"type": "string",
+			"description": "Authenticated user ID"
+		},
+		{
+			"key": "userEmail",
+			"value": "",
+			"type": "string",
+			"description": "Authenticated user email"
+		},
+		{
+			"key": "productId",
+			"value": "prod-12345678-1234-1234-1234-123456789012",
+			"type": "string",
+			"description": "Sample product ID for testing"
+		},
+		{
+			"key": "orderId",
+			"value": "order-12345678-1234-1234-1234-123456789012",
+			"type": "string",
+			"description": "Sample order ID for testing"
+		},
+		{
+			"key": "sellerId",
+			"value": "seller-12345678-1234-1234-1234-123456789012",
+			"type": "string",
+			"description": "Sample seller ID for testing"
+		},
+		{
+			"key": "buyerId",
+			"value": "buyer-12345678-1234-1234-1234-123456789012",
+			"type": "string",
+			"description": "Sample buyer ID for testing"
+		},
+		{
+			"key": "conversationId",
+			"value": "conv-12345678-1234-1234-1234-123456789012",
+			"type": "string",
+			"description": "Sample conversation ID for messaging"
+		},
+		{
+			"key": "messageId",
+			"value": "msg-12345678-1234-1234-1234-123456789012",
+			"type": "string",
+			"description": "Sample message ID for messaging"
+		},
+		{
+			"key": "ticketId",
+			"value": "ticket-12345678-1234-1234-1234-123456789012",
+			"type": "string",
+			"description": "Sample ticket ID for support"
+		},
+		{
+			"key": "campaignId",
+			"value": "camp-12345678-1234-1234-1234-123456789012",
+			"type": "string",
+			"description": "Sample campaign ID for advertising"
+		},
+		{
+			"key": "adId",
+			"value": "ad-12345678-1234-1234-1234-123456789012",
+			"type": "string",
+			"description": "Sample ad ID for advertising"
+		},
+		{
+			"key": "modelId",
+			"value": "model-12345678-1234-1234-1234-123456789012",
+			"type": "string",
+			"description": "Sample ML model ID"
+		},
+		{
+			"key": "reportId",
+			"value": "report-12345678-1234-1234-1234-123456789012",
+			"type": "string",
+			"description": "Sample report ID"
+		},
+		{
+			"key": "wishlistId",
+			"value": "wishlist-12345678-1234-1234-1234-123456789012",
+			"type": "string",
+			"description": "Sample wishlist ID"
+		},
+		{
+			"key": "reviewId",
+			"value": "review-12345678-1234-1234-1234-123456789012",
+			"type": "string",
+			"description": "Sample review ID"
+		},
+		{
+			"key": "rewardId",
+			"value": "reward-12345678-1234-1234-1234-123456789012",
+			"type": "string",
+			"description": "Sample reward ID"
+		},
+		{
+			"key": "subscriptionId",
+			"value": "sub-12345678-1234-1234-1234-123456789012",
+			"type": "string",
+			"description": "Sample subscription ID"
+		},
+		{
+			"key": "fileId",
+			"value": "file-12345678-1234-1234-1234-123456789012",
+			"type": "string",
+			"description": "Sample file ID"
+		},
+		{
+			"key": "redirectId",
+			"value": "redirect-12345678-1234-1234-1234-123456789012",
+			"type": "string",
+			"description": "Sample redirect ID"
+		},
+		{
+			"key": "shareId",
+			"value": "share-12345678-1234-1234-1234-123456789012",
+			"type": "string",
+			"description": "Sample share ID"
+		},
+		{
+			"key": "postId",
+			"value": "post-12345678-1234-1234-1234-123456789012",
+			"type": "string",
+			"description": "Sample social post ID"
+		},
+		{
+			"key": "trackingNumber",
+			"value": "TRK123456789NG",
+			"type": "string",
+			"description": "Sample tracking number"
+		},
+		{
+			"key": "agentId",
+			"value": "agent-12345678-1234-1234-1234-123456789012",
+			"type": "string",
+			"description": "Sample agent ID"
+		}
+	]
+}

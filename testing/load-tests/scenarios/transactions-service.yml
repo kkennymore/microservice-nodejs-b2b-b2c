@@ -1,0 +1,220 @@
+# Transactions Service Load Testing Scenarios
+
+scenarios:
+  # Get User Wallet Balance
+  - name: "Get Wallet Balance"
+    weight: 25
+    flow:
+      - get:
+          url: "/api/transactions/wallet"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  # Get Transaction History
+  - name: "Get Transaction History"
+    weight: 20
+    flow:
+      - get:
+          url: "/api/transactions?page={{ $randomInt(1, 5) }}&limit=10"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  # Get Single Transaction
+  - name: "Get Single Transaction"
+    weight: 15
+    flow:
+      - get:
+          url: "/api/transactions/{{ $randomInt(1, 10000) }}"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: [200, 404]  # Accept both found and not found
+
+  # Add Money to Wallet
+  - name: "Add Money to Wallet"
+    weight: 8
+    flow:
+      - post:
+          url: "/api/transactions/wallet/deposit"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            amount: "{{ $randomInt(10, 100) }}"
+            currency: "USD"
+            paymentMethodId: "card_{{ $randomInt }}"
+            description: "Load test deposit"
+          expect:
+            - statusCode: [201, 400]  # Accept both success and validation errors
+
+  # Process Payment
+  - name: "Process Payment"
+    weight: 12
+    flow:
+      - post:
+          url: "/api/transactions/payment"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            orderId: "order_{{ $randomInt }}"
+            amount: "{{ $randomInt(20, 500) }}"
+            currency: "USD"
+            paymentMethod: "card"
+            billingAddress: {
+              street: "123 Test St",
+              city: "Test City",
+              state: "TS",
+              postalCode: "12345",
+              country: "US"
+            }
+          expect:
+            - statusCode: [201, 400]  # Accept both success and validation errors
+
+  # Get Payment Methods
+  - name: "Get Payment Methods"
+    weight: 10
+    flow:
+      - get:
+          url: "/api/transactions/payment-methods"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  # Add Payment Method
+  - name: "Add Payment Method"
+    weight: 6
+    flow:
+      - post:
+          url: "/api/transactions/payment-methods"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            type: "card"
+            cardNumber: "4111111111111111"
+            expiryMonth: "{{ $randomInt(1, 12) }}"
+            expiryYear: "{{ $randomInt(2024, 2030) }}"
+            cvv: "123"
+            cardholderName: "Test User"
+            billingAddress: {
+              street: "123 Test St",
+              city: "Test City",
+              state: "TS",
+              postalCode: "12345",
+              country: "US"
+            }
+          expect:
+            - statusCode: [201, 400]  # Accept both success and validation errors
+
+  # Process Refund
+  - name: "Process Refund"
+    weight: 4
+    flow:
+      - post:
+          url: "/api/transactions/refund"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            transactionId: "txn_{{ $randomInt }}"
+            amount: "{{ $randomInt(10, 100) }}"
+            reason: "Load test refund"
+          expect:
+            - statusCode: [200, 400, 404]  # Accept various responses
+
+  # Get Subscription Plans
+  - name: "Get Subscription Plans"
+    weight: 8
+    flow:
+      - get:
+          url: "/api/transactions/subscriptions/plans"
+          expect:
+            - statusCode: 200
+
+  # Create Subscription
+  - name: "Create Subscription"
+    weight: 5
+    flow:
+      - post:
+          url: "/api/transactions/subscriptions"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            planId: "{{ $randomInt(1, 3) }}"
+            paymentMethodId: "card_{{ $randomInt }}"
+          expect:
+            - statusCode: [201, 400]  # Accept both success and validation errors
+
+  # Get User Subscription
+  - name: "Get User Subscription"
+    weight: 7
+    flow:
+      - get:
+          url: "/api/transactions/subscriptions"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  # Cancel Subscription
+  - name: "Cancel Subscription"
+    weight: 3
+    flow:
+      - delete:
+          url: "/api/transactions/subscriptions/{{ $randomInt(1, 100) }}"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: [200, 404]  # Accept both success and not found
+
+  # Get Transaction Analytics
+  - name: "Get Transaction Analytics"
+    weight: 9
+    flow:
+      - get:
+          url: "/api/transactions/analytics?period=30d"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  # Wallet Transfer
+  - name: "Wallet Transfer"
+    weight: 4
+    flow:
+      - post:
+          url: "/api/transactions/wallet/transfer"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            toUserId: "{{ $randomInt(1, 1000) }}"
+            amount: "{{ $randomInt(5, 50) }}"
+            description: "Load test transfer"
+          expect:
+            - statusCode: [200, 400, 404]  # Accept various responses
+
+  # Bulk Transaction Processing
+  - name: "Bulk Transaction Processing"
+    weight: 2
+    flow:
+      - post:
+          url: "/api/transactions/bulk"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            transactions: [
+              {
+                type: "deposit",
+                amount: "{{ $randomInt(10, 100) }}",
+                description: "Bulk load test 1"
+              },
+              {
+                type: "withdrawal",
+                amount: "{{ $randomInt(5, 50) }}",
+                description: "Bulk load test 2"
+              }
+            ]
+          expect:
+            - statusCode: [200, 400]  # Accept both success and validation errors

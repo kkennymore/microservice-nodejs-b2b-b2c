@@ -1,0 +1,190 @@
+{
+  "rabbit_version": "3.12",
+  "users": [
+    {
+      "name": "admin",
+      "password_hash": "hashed_password_here",
+      "tags": "administrator"
+    }
+  ],
+  "vhosts": [
+    {
+      "name": "marketplace"
+    }
+  ],
+  "permissions": [
+    {
+      "user": "admin",
+      "vhost": "marketplace",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    }
+  ],
+  "parameters": [],
+  "policies": [
+    {
+      "name": "ha-policy",
+      "pattern": ".*",
+      "vhost": "marketplace",
+      "definition": {
+        "ha-mode": "all",
+        "ha-sync-mode": "automatic"
+      }
+    }
+  ],
+  "queues": [
+    {
+      "name": "email_queue",
+      "vhost": "marketplace",
+      "durable": true,
+      "arguments": {
+        "x-message-ttl": 86400000,
+        "x-max-retries": 3
+      }
+    },
+    {
+      "name": "notification_queue",
+      "vhost": "marketplace",
+      "durable": true,
+      "arguments": {
+        "x-message-ttl": 86400000,
+        "x-max-retries": 3
+      }
+    },
+    {
+      "name": "transaction_queue",
+      "vhost": "marketplace",
+      "durable": true,
+      "arguments": {
+        "x-message-ttl": 86400000,
+        "x-max-retries": 3
+      }
+    },
+    {
+      "name": "product_queue",
+      "vhost": "marketplace",
+      "durable": true,
+      "arguments": {
+        "x-message-ttl": 86400000,
+        "x-max-retries": 3
+      }
+    },
+    {
+      "name": "ticket_queue",
+      "vhost": "marketplace",
+      "durable": true,
+      "arguments": {
+        "x-message-ttl": 86400000,
+        "x-max-retries": 3
+      }
+    },
+    {
+      "name": "analytics_events",
+      "vhost": "marketplace",
+      "durable": true,
+      "arguments": {
+        "x-message-ttl": 604800000,
+        "x-max-length": 1000000
+      }
+    },
+    {
+      "name": "user_events",
+      "vhost": "marketplace",
+      "durable": true,
+      "arguments": {
+        "x-message-ttl": 604800000
+      }
+    },
+    {
+      "name": "sales_events",
+      "vhost": "marketplace",
+      "durable": true,
+      "arguments": {
+        "x-message-ttl": 604800000
+      }
+    },
+    {
+      "name": "product_events",
+      "vhost": "marketplace",
+      "durable": true,
+      "arguments": {
+        "x-message-ttl": 604800000
+      }
+    }
+  ],
+  "exchanges": [
+    {
+      "name": "marketplace_exchange",
+      "vhost": "marketplace",
+      "type": "topic",
+      "durable": true,
+      "arguments": {}
+    }
+  ],
+  "bindings": [
+    {
+      "source": "marketplace_exchange",
+      "vhost": "marketplace",
+      "destination": "email_queue",
+      "destination_type": "queue",
+      "routing_key": "email.#"
+    },
+    {
+      "source": "marketplace_exchange",
+      "vhost": "marketplace",
+      "destination": "notification_queue",
+      "destination_type": "queue",
+      "routing_key": "notification.#"
+    },
+    {
+      "source": "marketplace_exchange",
+      "vhost": "marketplace",
+      "destination": "transaction_queue",
+      "destination_type": "queue",
+      "routing_key": "transaction.#"
+    },
+    {
+      "source": "marketplace_exchange",
+      "vhost": "marketplace",
+      "destination": "product_queue",
+      "destination_type": "queue",
+      "routing_key": "product.#"
+    },
+    {
+      "source": "marketplace_exchange",
+      "vhost": "marketplace",
+      "destination": "ticket_queue",
+      "destination_type": "queue",
+      "routing_key": "ticket.#"
+    },
+    {
+      "source": "marketplace_exchange",
+      "vhost": "marketplace",
+      "destination": "analytics_events",
+      "destination_type": "queue",
+      "routing_key": "analytics.#"
+    },
+    {
+      "source": "marketplace_exchange",
+      "vhost": "marketplace",
+      "destination": "user_events",
+      "destination_type": "queue",
+      "routing_key": "user.#"
+    },
+    {
+      "source": "marketplace_exchange",
+      "vhost": "marketplace",
+      "destination": "sales_events",
+      "destination_type": "queue",
+      "routing_key": "sales.#"
+    },
+    {
+      "source": "marketplace_exchange",
+      "vhost": "marketplace",
+      "destination": "product_events",
+      "destination_type": "queue",
+      "routing_key": "product.view"
+    }
+  ]
+}

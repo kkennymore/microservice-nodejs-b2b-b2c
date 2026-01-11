@@ -1,0 +1,21 @@
+User-agent: *
+Allow: /
+
+# Block admin areas
+Disallow: /admin
+Disallow: /dashboard
+
+# Block API routes
+Disallow: /api/
+
+# Block development files
+Disallow: *.json
+Disallow: *.map
+
+# Allow crawling of main content
+Allow: /
+Allow: /product/
+Allow: /category/
+
+# Sitemap
+Sitemap: https://yourdomain.com/sitemap.xml

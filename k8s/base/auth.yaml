@@ -1,0 +1,123 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth
+  namespace: marketplace
+  labels:
+    app: auth
+    component: microservice
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: auth
+  template:
+    metadata:
+      labels:
+        app: auth
+        component: microservice
+    spec:
+      containers:
+      - name: auth
+        image: marketplace/auth:latest
+        ports:
+        - containerPort: 3001
+          name: http
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: AUTH_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: marketplace-config
+              key: AUTH_PORT
+        - name: JWT_SECRET
+          valueFrom:
+            configMapKeyRef:
+              name: marketplace-config
+              key: JWT_SECRET
+        - name: JWT_EXPIRES_IN
+          valueFrom:
+            configMapKeyRef:
+              name: marketplace-config
+              key: JWT_EXPIRES_IN
+        - name: JWT_REFRESH_EXPIRES_IN
+          valueFrom:
+            configMapKeyRef:
+              name: marketplace-config
+              key: JWT_REFRESH_EXPIRES_IN
+        - name: DATABASE_HOST
+          value: "mysql"
+        - name: DATABASE_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: marketplace-config
+              key: MYSQL_PORT
+        - name: DATABASE_USERNAME
+          valueFrom:
+            configMapKeyRef:
+              name: marketplace-config
+              key: MYSQL_USER
+        - name: DATABASE_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              name: marketplace-config
+              key: MYSQL_PASSWORD
+        - name: DATABASE_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: marketplace-config
+              key: MYSQL_DATABASE
+        - name: REDIS_HOST
+          value: "redis"
+        - name: REDIS_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: marketplace-config
+              key: REDIS_PORT
+        - name: FRONTEND_URL
+          valueFrom:
+            configMapKeyRef:
+              name: marketplace-config
+              key: FRONTEND_URL
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "50m"
+          limits:
+            memory: "256Mi"
+            cpu: "100m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3001
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3001
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 2
+          failureThreshold: 3
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth
+  namespace: marketplace
+  labels:
+    app: auth
+    component: microservice
+spec:
+  selector:
+    app: auth
+  ports:
+  - port: 3001
+    targetPort: 3001
+    name: http
+  type: ClusterIP

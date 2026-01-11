@@ -1,0 +1,141 @@
+# Products Service Load Testing Scenarios
+
+scenarios:
+  # Get Products List
+  - name: "Get Products List"
+    weight: 40
+    flow:
+      - get:
+          url: "/api/products?page={{ $randomInt(1, 10) }}&limit=20&category={{ $randomInt(1, 5) }}"
+          expect:
+            - statusCode: 200
+          capture:
+            json: "$.data.products[0].id"
+            as: "productId"
+
+  # Get Single Product
+  - name: "Get Single Product"
+    weight: 25
+    flow:
+      - get:
+          url: "/api/products/{{ productId || $randomInt(1, 1000) }}"
+          expect:
+            - statusCode: 200
+
+  # Search Products
+  - name: "Search Products"
+    weight: 20
+    flow:
+      - get:
+          url: "/api/products/search?q={{ $randomString }}&limit=10"
+          expect:
+            - statusCode: 200
+
+  # Get Product Categories
+  - name: "Get Categories"
+    weight: 10
+    flow:
+      - get:
+          url: "/api/products/categories"
+          expect:
+            - statusCode: 200
+
+  # Get Products by Category
+  - name: "Get Products by Category"
+    weight: 15
+    flow:
+      - get:
+          url: "/api/products/category/{{ $randomInt(1, 5) }}?page=1&limit=12"
+          expect:
+            - statusCode: 200
+
+  # Product Recommendations
+  - name: "Product Recommendations"
+    weight: 8
+    flow:
+      - get:
+          url: "/api/products/recommendations/{{ $randomInt(1, 1000) }}"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  # Create Product (Admin/Seller only)
+  - name: "Create Product"
+    weight: 5
+    flow:
+      - post:
+          url: "/api/products"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            name: "Test Product {{ $randomInt }}"
+            description: "This is a test product for load testing"
+            price: "{{ $randomInt(10, 500) }}"
+            categoryId: "{{ $randomInt(1, 5) }}"
+            stock: "{{ $randomInt(10, 100) }}"
+            images: ["https://example.com/image.jpg"]
+          expect:
+            - statusCode: [201, 403]  # Accept both success and unauthorized
+
+  # Update Product
+  - name: "Update Product"
+    weight: 3
+    flow:
+      - put:
+          url: "/api/products/{{ productId || $randomInt(1, 100) }}"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            price: "{{ $randomInt(15, 550) }}"
+            stock: "{{ $randomInt(5, 95) }}"
+          expect:
+            - statusCode: [200, 403, 404]  # Accept various responses
+
+  # Product Reviews
+  - name: "Get Product Reviews"
+    weight: 12
+    flow:
+      - get:
+          url: "/api/products/{{ productId || $randomInt(1, 1000) }}/reviews?page=1&limit=5"
+          expect:
+            - statusCode: 200
+
+  # Add Product Review
+  - name: "Add Product Review"
+    weight: 6
+    flow:
+      - post:
+          url: "/api/products/{{ productId || $randomInt(1, 1000) }}/reviews"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            rating: "{{ $randomInt(1, 5) }}"
+            comment: "This is a test review from load testing"
+          expect:
+            - statusCode: [201, 403, 400]  # Accept various responses
+
+  # Product Inventory Check
+  - name: "Check Product Inventory"
+    weight: 18
+    flow:
+      - get:
+          url: "/api/products/{{ productId || $randomInt(1, 1000) }}/inventory"
+          expect:
+            - statusCode: 200
+
+  # Bulk Product Operations
+  - name: "Bulk Product Update"
+    weight: 2
+    flow:
+      - post:
+          url: "/api/products/bulk-update"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            products: [
+              { id: "{{ $randomInt(1, 100) }}", price: "{{ $randomInt(20, 300) }}" },
+              { id: "{{ $randomInt(101, 200) }}", stock: "{{ $randomInt(10, 50) }}" }
+            ]
+          expect:
+            - statusCode: [200, 403]  # Accept both success and unauthorized

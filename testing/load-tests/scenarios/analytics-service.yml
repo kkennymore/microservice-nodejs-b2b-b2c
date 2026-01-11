@@ -1,0 +1,174 @@
+# Analytics Service Load Testing Scenarios
+
+scenarios:
+  # Get Analytics Overview
+  - name: "Analytics Overview"
+    weight: 20
+    flow:
+      - get:
+          url: "/api/analytics/overview?start_date={{ new Date(Date.now() - 86400000 * 7).toISOString().split('T')[0] }}&end_date={{ new Date().toISOString().split('T')[0] }}"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  # Get Sales Analytics
+  - name: "Sales Analytics"
+    weight: 18
+    flow:
+      - get:
+          url: "/api/analytics/sales?start_date={{ new Date(Date.now() - 86400000 * 30).toISOString().split('T')[0] }}&end_date={{ new Date().toISOString().split('T')[0] }}&group_by=day"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  # Get User Analytics
+  - name: "User Analytics"
+    weight: 15
+    flow:
+      - get:
+          url: "/api/analytics/users?start_date={{ new Date(Date.now() - 86400000 * 14).toISOString().split('T')[0] }}&end_date={{ new Date().toISOString().split('T')[0] }}"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  # Get Product Analytics
+  - name: "Product Analytics"
+    weight: 12
+    flow:
+      - get:
+          url: "/api/analytics/products?start_date={{ new Date(Date.now() - 86400000 * 7).toISOString().split('T')[0] }}&end_date={{ new Date().toISOString().split('T')[0] }}"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  # Get Dashboard KPIs
+  - name: "Dashboard KPIs"
+    weight: 25
+    flow:
+      - get:
+          url: "/api/dashboard/kpis?start_date={{ new Date(Date.now() - 86400000 * 7).toISOString().split('T')[0] }}&end_date={{ new Date().toISOString().split('T')[0] }}"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  # Get Revenue Chart
+  - name: "Revenue Chart"
+    weight: 16
+    flow:
+      - get:
+          url: "/api/dashboard/revenue-chart?start_date={{ new Date(Date.now() - 86400000 * 30).toISOString().split('T')[0] }}&end_date={{ new Date().toISOString().split('T')[0] }}&group_by={{ ['day', 'week', 'month'][$randomInt(0, 2)] }}"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  # Get Top Metrics
+  - name: "Top Metrics"
+    weight: 10
+    flow:
+      - get:
+          url: "/api/dashboard/top-metrics"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  # Get Real-time Metrics
+  - name: "Real-time Metrics"
+    weight: 8
+    flow:
+      - get:
+          url: "/api/analytics/realtime"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  # Generate Sales Report
+  - name: "Generate Sales Report"
+    weight: 6
+    flow:
+      - get:
+          url: "/api/reports/sales?start_date={{ new Date(Date.now() - 86400000 * 30).toISOString().split('T')[0] }}&end_date={{ new Date().toISOString().split('T')[0] }}&format=json"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  # Generate User Report
+  - name: "Generate User Report"
+    weight: 5
+    flow:
+      - get:
+          url: "/api/reports/users?start_date={{ new Date(Date.now() - 86400000 * 14).toISOString().split('T')[0] }}&end_date={{ new Date().toISOString().split('T')[0] }}&format=json"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  # Customer Lifetime Value
+  - name: "Customer Lifetime Value"
+    weight: 7
+    flow:
+      - get:
+          url: "/api/analytics/customers/lifetime-value"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  # Track Analytics Event
+  - name: "Track Analytics Event"
+    weight: 14
+    flow:
+      - post:
+          url: "/api/analytics/event"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            event_type: "page_view"
+            event_data:
+              page: "/load-test-page-{{ $randomInt }}"
+              duration: "{{ $randomInt(10, 300) }}"
+              referrer: "/previous-page"
+            ip_address: "192.168.1.{{ $randomInt(1, 255) }}"
+          expect:
+            - statusCode: 200
+
+  # Get Event Statistics
+  - name: "Event Statistics"
+    weight: 9
+    flow:
+      - get:
+          url: "/api/analytics/events/stats?start_date={{ new Date(Date.now() - 86400000).toISOString().split('T')[0] }}&end_date={{ new Date().toISOString().split('T')[0] }}"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  # Dashboard Summary
+  - name: "Dashboard Summary"
+    weight: 11
+    flow:
+      - get:
+          url: "/api/dashboard/summary"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  # Performance Metrics
+  - name: "Performance Metrics"
+    weight: 4
+    flow:
+      - get:
+          url: "/api/dashboard/realtime"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200

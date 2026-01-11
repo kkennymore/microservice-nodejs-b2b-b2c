@@ -1,0 +1,122 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: advertising
+  namespace: marketplace
+  labels:
+    app: advertising
+    component: microservice
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: advertising
+  template:
+    metadata:
+      labels:
+        app: advertising
+        component: microservice
+    spec:
+      containers:
+      - name: advertising
+        image: marketplace/advertising:latest
+        ports:
+        - containerPort: 3006
+          name: http
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: ADVERTISING_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: marketplace-config
+              key: ADVERTISING_PORT
+        - name: JWT_SECRET
+          valueFrom:
+            configMapKeyRef:
+              name: marketplace-config
+              key: JWT_SECRET
+        - name: DB_HOST
+          value: "mysql"
+        - name: DB_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: marketplace-config
+              key: MYSQL_PORT
+        - name: DB_USER
+          valueFrom:
+            configMapKeyRef:
+              name: marketplace-config
+              key: MYSQL_USER
+        - name: DB_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              name: marketplace-config
+              key: MYSQL_PASSWORD
+        - name: DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: marketplace-config
+              key: MYSQL_DATABASE
+        - name: REDIS_HOST
+          value: "redis"
+        - name: REDIS_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: marketplace-config
+              key: REDIS_PORT
+        - name: RABBITMQ_URL
+          value: "amqp://$(RABBITMQ_USER):$(RABBITMQ_PASSWORD)@rabbitmq:5672/$(RABBITMQ_VHOST)"
+        - name: FRONTEND_URL
+          valueFrom:
+            configMapKeyRef:
+              name: marketplace-config
+              key: FRONTEND_URL
+        volumeMounts:
+        - name: uploads
+          mountPath: /app/uploads
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3006
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3006
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 2
+          failureThreshold: 3
+      volumes:
+      - name: uploads
+        persistentVolumeClaim:
+          claimName: uploads-data-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: advertising
+  namespace: marketplace
+  labels:
+    app: advertising
+    component: microservice
+spec:
+  selector:
+    app: advertising
+  ports:
+  - port: 3006
+    targetPort: 3006
+    name: http
+  type: ClusterIP

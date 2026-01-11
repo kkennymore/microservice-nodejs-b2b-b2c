@@ -1,0 +1,319 @@
+services:
+  # RabbitMQ Message Queue
+  rabbitmq:
+    image: rabbitmq:3.12-management-alpine
+    container_name: marketplace-rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-admin}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-admin123}
+      RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_VHOST:-marketplace}
+    ports:
+      - "127.0.0.1:${RABBITMQ_PORT:-5672}:5672"
+      - "127.0.0.1:${RABBITMQ_MANAGEMENT_PORT:-15672}:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+      - ./docker/rabbitmq/definitions.json:/etc/rabbitmq/definitions.json
+      - ./docker/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+    networks:
+      - marketplace
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # API Gateway
+  gateway:
+    build:
+      context: ./backend/services/gateway
+      dockerfile: Dockerfile
+    container_name: marketplace-gateway
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: ${GATEWAY_PORT:-9000}
+      MYSQL_HOST: ${DB_HOST:-localhost}
+      MYSQL_PORT: ${MYSQL_PORT:-3306}
+      MYSQL_USER: ${MYSQL_USER:-marketplace}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-marketplace123}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-fenap_marketplace}
+      REDIS_HOST: ${REDIS_HOST:-localhost}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      RABBITMQ_URL: amqp://${RABBITMQ_USER:-admin}:${RABBITMQ_PASSWORD:-admin123}@rabbitmq:${RABBITMQ_PORT:-5672}/${RABBITMQ_VHOST:-marketplace}
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - "127.0.0.1:9000:9000"
+    volumes:
+      - uploads_data:/app/uploads
+    networks:
+      - marketplace
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  # Authentication Service
+  auth:
+    build:
+      context: ./backend/services/auth
+      dockerfile: Dockerfile
+    container_name: marketplace-auth
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: ${AUTH_PORT:-9001}
+      MYSQL_HOST: ${DB_HOST:-localhost}
+      MYSQL_PORT: ${MYSQL_PORT:-3306}
+      MYSQL_USER: ${MYSQL_USER:-marketplace}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-marketplace123}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-fenap_marketplace}
+      REDIS_HOST: ${REDIS_HOST:-localhost}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      RABBITMQ_URL: amqp://${RABBITMQ_USER:-admin}:${RABBITMQ_PASSWORD:-admin123}@rabbitmq:${RABBITMQ_PORT:-5672}/${RABBITMQ_VHOST:-marketplace}
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - "127.0.0.1:9001:9001"
+    # volumes:
+    #   - ./backend/services/auth:/app
+    #   - /app/node_modules
+    networks:
+      - marketplace
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  # Products Service
+  products:
+    build:
+      context: ./backend/services/products
+      dockerfile: Dockerfile
+    container_name: marketplace-products
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: ${PRODUCTS_PORT:-9002}
+      MYSQL_HOST: ${DB_HOST:-localhost}
+      MYSQL_PORT: ${MYSQL_PORT:-3306}
+      MYSQL_USER: ${MYSQL_USER:-marketplace}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-marketplace123}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-fenap_marketplace}
+      REDIS_HOST: ${REDIS_HOST:-localhost}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      RABBITMQ_URL: amqp://${RABBITMQ_USER:-admin}:${RABBITMQ_PASSWORD:-admin123}@rabbitmq:${RABBITMQ_PORT:-5672}/${RABBITMQ_VHOST:-marketplace}
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - "127.0.0.1:9002:9002"
+    networks:
+      - marketplace
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  # Transactions Service
+  transactions:
+    build:
+      context: ./backend/services/transactions
+      dockerfile: Dockerfile
+    container_name: marketplace-transactions
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: ${TRANSACTIONS_PORT:-9003}
+      MYSQL_HOST: ${DB_HOST:-localhost}
+      MYSQL_PORT: ${MYSQL_PORT:-3306}
+      MYSQL_USER: ${MYSQL_USER:-marketplace}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-marketplace123}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-fenap_marketplace}
+      REDIS_HOST: ${REDIS_HOST:-localhost}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      RABBITMQ_URL: amqp://${RABBITMQ_USER:-admin}:${RABBITMQ_PASSWORD:-admin123}@rabbitmq:${RABBITMQ_PORT:-5672}/${RABBITMQ_VHOST:-marketplace}
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - "127.0.0.1:9003:9003"
+    networks:
+      - marketplace
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  # Messaging Service
+  messaging:
+    build:
+      context: ./backend/services/messaging
+      dockerfile: Dockerfile
+    container_name: marketplace-messaging
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: ${MESSAGING_PORT:-9004}
+      MYSQL_HOST: ${DB_HOST:-localhost}
+      MYSQL_PORT: ${MYSQL_PORT:-3306}
+      MYSQL_USER: ${MYSQL_USER:-marketplace}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-marketplace123}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-fenap_marketplace}
+      REDIS_HOST: ${REDIS_HOST:-localhost}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      RABBITMQ_URL: amqp://${RABBITMQ_USER:-admin}:${RABBITMQ_PASSWORD:-admin123}@rabbitmq:${RABBITMQ_PORT:-5672}/${RABBITMQ_VHOST:-marketplace}
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - "127.0.0.1:9004:9004"
+    networks:
+      - marketplace
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  # Notifications Service
+  notifications:
+    build:
+      context: ./backend/services/notifications
+      dockerfile: Dockerfile
+    container_name: marketplace-notifications
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: ${NOTIFICATIONS_PORT:-9005}
+      MYSQL_HOST: ${DB_HOST:-localhost}
+      MYSQL_PORT: ${MYSQL_PORT:-3306}
+      MYSQL_USER: ${MYSQL_USER:-marketplace}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-marketplace123}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-fenap_marketplace}
+      REDIS_HOST: ${REDIS_HOST:-localhost}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      RABBITMQ_URL: amqp://${RABBITMQ_USER:-admin}:${RABBITMQ_PASSWORD:-admin123}@rabbitmq:${RABBITMQ_PORT:-5672}/${RABBITMQ_VHOST:-marketplace}
+      JWT_SECRET: ${JWT_SECRET}
+      EMAIL_HOST: ${EMAIL_HOST}
+      EMAIL_PORT: ${EMAIL_PORT}
+      EMAIL_USER: ${EMAIL_USER}
+      EMAIL_PASS: ${EMAIL_PASS}
+    ports:
+      - "127.0.0.1:9005:9005"
+    networks:
+      - marketplace
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  # Analytics Service
+  analytics:
+     build:
+       context: ./backend/services/analytics
+       dockerfile: Dockerfile
+     container_name: marketplace-analytics
+     restart: unless-stopped
+     environment:
+       NODE_ENV: ${NODE_ENV:-production}
+       PORT: ${ANALYTICS_PORT:-9009}
+       MYSQL_HOST: ${DB_HOST:-localhost}
+       MYSQL_PORT: ${MYSQL_PORT:-3306}
+       MYSQL_USER: ${MYSQL_USER:-marketplace}
+       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-marketplace123}
+       MYSQL_DATABASE: ${MYSQL_DATABASE:-fenap_marketplace}
+       REDIS_HOST: ${REDIS_HOST:-localhost}
+       REDIS_PORT: ${REDIS_PORT:-6379}
+       RABBITMQ_URL: amqp://${RABBITMQ_USER:-admin}:${RABBITMQ_PASSWORD:-admin123}@rabbitmq:${RABBITMQ_PORT:-5672}/${RABBITMQ_VHOST:-marketplace}
+       JWT_SECRET: ${JWT_SECRET}
+     ports:
+      - "127.0.0.1:9009:9009"
+     networks:
+       - marketplace
+     depends_on:
+       rabbitmq:
+         condition: service_healthy
+
+  # Shipping Service
+  shipping:
+    build:
+      context: ./backend/services/shipping
+      dockerfile: Dockerfile
+    container_name: marketplace-shipping
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: ${SHIPPING_PORT:-9010}
+      MYSQL_HOST: ${DB_HOST:-localhost}
+      MYSQL_PORT: ${MYSQL_PORT:-3306}
+      MYSQL_USER: ${MYSQL_USER:-marketplace}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-marketplace123}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-fenap_marketplace}
+      REDIS_HOST: ${REDIS_HOST:-localhost}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      RABBITMQ_URL: amqp://${RABBITMQ_USER:-admin}:${RABBITMQ_PASSWORD:-admin123}@rabbitmq:${RABBITMQ_PORT:-5672}/${RABBITMQ_VHOST:-marketplace}
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - "127.0.0.1:9010:9010"
+    networks:
+      - marketplace
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  # Ticketing Service
+  ticketing:
+    build:
+      context: ./backend/services/ticketing
+      dockerfile: Dockerfile
+    container_name: marketplace-ticketing
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      MYSQL_HOST: ${DB_HOST:-localhost}
+      MYSQL_PORT: ${MYSQL_PORT:-3306}
+      MYSQL_USER: ${MYSQL_USER:-marketplace}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-marketplace123}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-fenap_marketplace}
+      REDIS_HOST: ${REDIS_HOST:-localhost}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      RABBITMQ_URL: amqp://${RABBITMQ_USER:-admin}:${RABBITMQ_PASSWORD:-admin123}@rabbitmq:${RABBITMQ_PORT:-5672}/${RABBITMQ_VHOST:-marketplace}
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - "127.0.0.1:9011:9011"
+    networks:
+      - marketplace
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  # System Service
+  system:
+    build:
+      context: ./backend/services/system
+      dockerfile: Dockerfile
+    container_name: marketplace-system
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: ${SYSTEM_PORT:-9008}
+      MYSQL_HOST: ${DB_HOST:-localhost}
+      MYSQL_PORT: ${MYSQL_PORT:-3306}
+      MYSQL_USER: ${MYSQL_USER:-marketplace}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-marketplace123}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-fenap_marketplace}
+      REDIS_HOST: ${REDIS_HOST:-localhost}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      RABBITMQ_URL: amqp://${RABBITMQ_USER:-admin}:${RABBITMQ_PASSWORD:-admin123}@rabbitmq:${RABBITMQ_PORT:-5672}/${RABBITMQ_VHOST:-marketplace}
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - "127.0.0.1:9008:9008"
+    networks:
+      - marketplace
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+volumes:
+  mysql_data:
+    driver: local
+  rabbitmq_data:
+    driver: local
+  shared_code:
+    driver: local
+  uploads_data:
+    driver: local
+
+networks:
+  marketplace:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

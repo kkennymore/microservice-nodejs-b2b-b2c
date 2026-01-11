@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-init-config
+  namespace: marketplace
+data:
+  01-init.sh: |
+    #!/bin/bash
+    set -e
+
+    echo "Waiting for MySQL to be ready..."
+    while ! mysqladmin ping -h localhost --silent; do
+        echo "MySQL is not ready, waiting..."
+        sleep 2
+    done
+
+    echo "MySQL is ready. Running initialization..."
+
+    # Create database if it doesn't exist
+    mysql -u root -p${MYSQL_ROOT_PASSWORD} -e "CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABASE};"
+
+    # Create user and grant privileges
+    mysql -u root -p${MYSQL_ROOT_PASSWORD} -e "CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';"
+    mysql -u root -p${MYSQL_ROOT_PASSWORD} -e "GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'%';"
+    mysql -u root -p${MYSQL_ROOT_PASSWORD} -e "FLUSH PRIVILEGES;"
+
+    echo "Database initialization completed."

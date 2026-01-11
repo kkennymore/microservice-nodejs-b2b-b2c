@@ -1,0 +1,51 @@
+# .rsync-exclude file
+# oaad-backend/
+frontend/node_modules/
+backend/vendor/
+node_modules
+nxm-frontend/
+frontend_bak/
+# .rsync-exclude
+# docker-compose.yaml
+# Docker.backend
+# Docker.frontend
+frontend/test-result/
+frontend/tests/
+frontend/gradle/
+frontend/build.gradle
+frontend/oaad.keystore
+frontend/settings.gradle
+frontend/gradle.properties
+frontend/gradlew
+frontend/gradlew.bat
+frontend/.vscode
+frontend/.gradle
+*.apk
+*.keystore
+*.log
+*.git/
+*.DS_Store
+*.vscode
+testing
+oaad-frontend/tests/
+oaad-frontend/build.gradle
+oaad-frontend/oaad.keystore
+oaad-frontend/settings.gradle
+oaad-frontend/gradle.properties
+oaad-frontend/gradlew
+oaad-frontend/gradlew.bat
+oaad-frontend/.vscode
+oaad-frontend/.gradle
+oaad-frontend/node_modules/
+
+
+oaad-backend/_tests_/
+oaad-backend/database_schema/
+oaad-backend/node_modules/
+oaad-frontend/oaad.keystore
+oaad-frontend/settings.gradle
+oaad-frontend/gradle.properties
+oaad-frontend/gradlew
+oaad-frontend/gradlew.bat
+oaad-frontend/.vscode
+oaad-frontend/.gradle

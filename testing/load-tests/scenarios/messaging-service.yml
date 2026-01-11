@@ -1,0 +1,173 @@
+# Messaging Service Load Testing Scenarios
+
+scenarios:
+  # Get User Conversations
+  - name: "Get Conversations"
+    weight: 25
+    flow:
+      - get:
+          url: "/api/conversations?page={{ $randomInt(1, 3) }}&limit=10"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  # Get Single Conversation
+  - name: "Get Single Conversation"
+    weight: 15
+    flow:
+      - get:
+          url: "/api/conversations/{{ $randomInt(1, 1000) }}"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: [200, 404]  # Accept both found and not found
+
+  # Send Message
+  - name: "Send Message"
+    weight: 20
+    flow:
+      - post:
+          url: "/api/messages"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            conversationId: "{{ $randomInt(1, 1000) }}"
+            content: "Load test message {{ $randomInt }}"
+            messageType: "text"
+          expect:
+            - statusCode: [201, 400]  # Accept both success and validation errors
+
+  # Get Conversation Messages
+  - name: "Get Conversation Messages"
+    weight: 18
+    flow:
+      - get:
+          url: "/api/conversations/{{ $randomInt(1, 1000) }}/messages?page={{ $randomInt(1, 5) }}&limit=20"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  # Create Conversation
+  - name: "Create Conversation"
+    weight: 10
+    flow:
+      - post:
+          url: "/api/conversations"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            participantIds: ["{{ $randomInt(1, 1000) }}", "{{ $randomInt(1001, 2000) }}"]
+            title: "Load Test Conversation {{ $randomInt }}"
+            type: "direct"
+          expect:
+            - statusCode: [201, 400]  # Accept both success and validation errors
+
+  # Mark Messages as Read
+  - name: "Mark Messages Read"
+    weight: 12
+    flow:
+      - put:
+          url: "/api/conversations/{{ $randomInt(1, 1000) }}/read"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            messageIds: ["msg_{{ $randomInt }}", "msg_{{ $randomInt }}"]
+          expect:
+            - statusCode: [200, 404]  # Accept both success and not found
+
+  # Upload File
+  - name: "Upload File"
+    weight: 5
+    flow:
+      - post:
+          url: "/api/files/upload"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+            Content-Type: "multipart/form-data"
+          formData:
+            file: "fake_file_content_{{ $randomInt }}"
+            fileName: "test_file_{{ $randomInt }}.txt"
+            fileType: "text/plain"
+          expect:
+            - statusCode: [201, 400]  # Accept both success and validation errors
+
+  # Get File Info
+  - name: "Get File Info"
+    weight: 8
+    flow:
+      - get:
+          url: "/api/files/{{ $randomInt(1, 1000) }}"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: [200, 404]  # Accept both found and not found
+
+  # Delete Message
+  - name: "Delete Message"
+    weight: 6
+    flow:
+      - delete:
+          url: "/api/messages/{{ $randomInt(1, 10000) }}"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: [200, 404]  # Accept both success and not found
+
+  # Search Messages
+  - name: "Search Messages"
+    weight: 7
+    flow:
+      - get:
+          url: "/api/messages/search?q=load+test&conversationId={{ $randomInt(1, 1000) }}&limit=10"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  # Get Conversation Participants
+  - name: "Get Conversation Participants"
+    weight: 9
+    flow:
+      - get:
+          url: "/api/conversations/{{ $randomInt(1, 1000) }}/participants"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  # Update Conversation
+  - name: "Update Conversation"
+    weight: 4
+    flow:
+      - put:
+          url: "/api/conversations/{{ $randomInt(1, 1000) }}"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            title: "Updated Load Test Conversation {{ $randomInt }}"
+          expect:
+            - statusCode: [200, 403, 404]  # Accept various responses
+
+  # Leave Conversation
+  - name: "Leave Conversation"
+    weight: 3
+    flow:
+      - delete:
+          url: "/api/conversations/{{ $randomInt(1, 1000) }}/leave"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: [200, 404]  # Accept both success and not found
+
+  # Get Message Statistics
+  - name: "Get Message Statistics"
+    weight: 5
+    flow:
+      - get:
+          url: "/api/messages/statistics?period=7d"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200

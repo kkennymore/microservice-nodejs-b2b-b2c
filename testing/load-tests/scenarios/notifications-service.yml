@@ -1,0 +1,194 @@
+# Notifications Service Load Testing Scenarios
+
+scenarios:
+  # Get User Notifications
+  - name: "Get Notifications"
+    weight: 30
+    flow:
+      - get:
+          url: "/api/notifications?page={{ $randomInt(1, 3) }}&limit=20&status={{ ['read', 'unread', 'all'][$randomInt(0, 2)] }}"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  # Mark Notification Read
+  - name: "Mark Notification Read"
+    weight: 15
+    flow:
+      - put:
+          url: "/api/notifications/{{ $randomInt(1, 10000) }}/read"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: [200, 404]  # Accept both success and not found
+
+  # Send Email Notification
+  - name: "Send Email Notification"
+    weight: 10
+    flow:
+      - post:
+          url: "/api/emails/send"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            to: "test{{ $randomInt }}@example.com"
+            subject: "Load Test Email {{ $randomInt }}"
+            html: "<h1>Test Email</h1><p>This is a load test email.</p>"
+            template: "general"
+          expect:
+            - statusCode: [200, 400]  # Accept both success and validation errors
+
+  # Send SMS Notification
+  - name: "Send SMS Notification"
+    weight: 8
+    flow:
+      - post:
+          url: "/api/sms/send"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            to: "+1234567890{{ $randomInt }}"
+            message: "Load test SMS message {{ $randomInt }}"
+            template: "general"
+          expect:
+            - statusCode: [200, 400]  # Accept both success and validation errors
+
+  # Send Push Notification
+  - name: "Send Push Notification"
+    weight: 6
+    flow:
+      - post:
+          url: "/api/push/send"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            userId: "{{ $randomInt(1, 1000) }}"
+            title: "Load Test Push"
+            body: "This is a load test push notification"
+            data: { type: "test", id: "{{ $randomInt }}" }
+          expect:
+            - statusCode: [200, 400]  # Accept both success and validation errors
+
+  # Create Notification Campaign
+  - name: "Create Notification Campaign"
+    weight: 5
+    flow:
+      - post:
+          url: "/api/campaigns"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            name: "Load Test Campaign {{ $randomInt }}"
+            type: "email"
+            targetAudience: "all_users"
+            subject: "Load Test Campaign"
+            content: "This is a load test campaign"
+            scheduledAt: "{{ new Date(Date.now() + 86400000).toISOString() }}"
+          expect:
+            - statusCode: [201, 403]  # Accept both success and unauthorized
+
+  # Get Campaign Statistics
+  - name: "Get Campaign Statistics"
+    weight: 7
+    flow:
+      - get:
+          url: "/api/campaigns/{{ $randomInt(1, 100) }}/stats"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: [200, 404]  # Accept both success and not found
+
+  # Get Notification Templates
+  - name: "Get Notification Templates"
+    weight: 12
+    flow:
+      - get:
+          url: "/api/notifications/templates?type={{ ['email', 'sms', 'push'][$randomInt(0, 2)] }}"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  # Update Notification Preferences
+  - name: "Update Notification Preferences"
+    weight: 9
+    flow:
+      - put:
+          url: "/api/notifications/preferences"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            email_enabled: "{{ Math.random() > 0.5 }}"
+            sms_enabled: "{{ Math.random() > 0.5 }}"
+            push_enabled: "{{ Math.random() > 0.5 }}"
+          expect:
+            - statusCode: 200
+
+  # Bulk Notification Send
+  - name: "Bulk Notification Send"
+    weight: 4
+    flow:
+      - post:
+          url: "/api/notifications/bulk-send"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            type: "email"
+            recipients: [
+              "user{{ $randomInt }}@example.com",
+              "user{{ $randomInt }}@example.com"
+            ]
+            subject: "Bulk Load Test"
+            content: "This is a bulk load test notification"
+          expect:
+            - statusCode: [200, 400]  # Accept both success and validation errors
+
+  # Get Notification Analytics
+  - name: "Get Notification Analytics"
+    weight: 11
+    flow:
+      - get:
+          url: "/api/analytics/notifications?period=7d&groupBy=day"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  # Delete Notification
+  - name: "Delete Notification"
+    weight: 6
+    flow:
+      - delete:
+          url: "/api/notifications/{{ $randomInt(1, 10000) }}"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: [200, 404]  # Accept both success and not found
+
+  # Get Notification Settings
+  - name: "Get Notification Settings"
+    weight: 8
+    flow:
+      - get:
+          url: "/api/notifications/settings"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  # Test Notification Delivery
+  - name: "Test Notification Delivery"
+    weight: 3
+    flow:
+      - post:
+          url: "/api/notifications/test"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            type: "email"
+            recipient: "test@example.com"
+            subject: "Test Notification"
+            content: "This is a test notification"
+          expect:
+            - statusCode: [200, 400]  # Accept both success and validation errors

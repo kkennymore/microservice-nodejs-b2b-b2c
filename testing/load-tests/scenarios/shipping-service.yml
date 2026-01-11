@@ -1,0 +1,236 @@
+# Shipping Service Load Testing Scenarios
+
+scenarios:
+  # Get Shipping Rates
+  - name: "Get Shipping Rates"
+    weight: 25
+    flow:
+      - post:
+          url: "/api/shipping/rates"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            ship_from:
+              street: "123 Main St"
+              city: "New York"
+              state: "NY"
+              postalCode: "10001"
+              country: "US"
+            ship_to:
+              street: "{{ $randomInt(100, 999) }} Test Ave"
+              city: "Los Angeles"
+              state: "CA"
+              postalCode: "90210"
+              country: "US"
+            items:
+              - weight: "{{ $randomInt(5, 50) / 10 }}"
+                quantity: "{{ $randomInt(1, 5) }}"
+                length: "{{ $randomInt(8, 24) }}"
+                width: "{{ $randomInt(6, 18) }}"
+                height: "{{ $randomInt(2, 12) }}"
+          expect:
+            - statusCode: 200
+
+  # Get Available Carriers
+  - name: "Get Available Carriers"
+    weight: 15
+    flow:
+      - get:
+          url: "/api/shipping/carriers"
+          expect:
+            - statusCode: 200
+
+  # Validate Shipping Address
+  - name: "Validate Shipping Address"
+    weight: 12
+    flow:
+      - post:
+          url: "/api/shipping/validate-address"
+          json:
+            street: "{{ $randomInt(100, 999) }} Test Street"
+            city: "Test City"
+            state: "{{ ['NY', 'CA', 'TX', 'FL'][$randomInt(0, 3)] }}"
+            postalCode: "{{ $randomInt(10000, 99999) }}"
+            country: "US"
+          expect:
+            - statusCode: 200
+
+  # Get Shipping Zones
+  - name: "Get Shipping Zones"
+    weight: 8
+    flow:
+      - get:
+          url: "/api/shipping/zones"
+          expect:
+            - statusCode: 200
+
+  # Track Shipment
+  - name: "Track Shipment"
+    weight: 18
+    flow:
+      - get:
+          url: "/api/shipping/track/{{ ['1Z999AA1234567890', '9405511899223345678901', 'fedex_tracking_123'][$randomInt(0, 2)] }}"
+          expect:
+            - statusCode: [200, 404]  # Accept both found and not found
+
+  # Get Seller Shipments
+  - name: "Get Seller Shipments"
+    weight: 10
+    flow:
+      - get:
+          url: "/api/shipping/seller/shipments?page={{ $randomInt(1, 3) }}&limit=10&status={{ ['pending', 'shipped', 'delivered'][$randomInt(0, 2)] }}"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  # Create Shipment
+  - name: "Create Shipment"
+    weight: 7
+    flow:
+      - post:
+          url: "/api/shipping/shipments"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            orderId: "order_{{ $randomInt }}"
+            carrierId: "{{ $randomInt(1, 3) }}"
+            serviceType: "{{ ['GROUND', 'EXPRESS', 'STANDARD'][$randomInt(0, 2)] }}"
+            items:
+              - productId: "{{ $randomInt(1, 1000) }}"
+                quantity: "{{ $randomInt(1, 3) }}"
+                weight: "{{ $randomInt(5, 50) / 10 }}"
+            ship_from:
+              street: "123 Warehouse St"
+              city: "New York"
+              state: "NY"
+              postalCode: "10001"
+              country: "US"
+            ship_to:
+              street: "{{ $randomInt(100, 999) }} Customer Ave"
+              city: "Los Angeles"
+              state: "CA"
+              postalCode: "90210"
+              country: "US"
+            weight: "{{ $randomInt(10, 100) / 10 }}"
+          expect:
+            - statusCode: [201, 400]  # Accept both success and validation errors
+
+  # Update Seller Shipping Settings
+  - name: "Update Shipping Settings"
+    weight: 6
+    flow:
+      - put:
+          url: "/api/shipping/seller/settings"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            default_carrier_id: "{{ $randomInt(1, 3) }}"
+            free_shipping_threshold: "{{ $randomInt(50, 200) }}"
+            handling_time_days: "{{ $randomInt(1, 5) }}"
+            return_policy: "Standard return policy for load testing"
+          expect:
+            - statusCode: [200, 403]  # Accept both success and unauthorized
+
+  # Get Seller Shipping Settings
+  - name: "Get Shipping Settings"
+    weight: 9
+    flow:
+      - get:
+          url: "/api/shipping/seller/settings"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  # Get Shipment by ID
+  - name: "Get Shipment by ID"
+    weight: 11
+    flow:
+      - get:
+          url: "/api/shipping/shipments/{{ $randomInt(1, 10000) }}"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: [200, 404]  # Accept both found and not found
+
+  # Bulk Shipping Rate Check
+  - name: "Bulk Shipping Rates"
+    weight: 4
+    flow:
+      - post:
+          url: "/api/shipping/bulk-rates"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            shipments:
+              - ship_from:
+                  street: "123 Main St"
+                  city: "NYC"
+                  state: "NY"
+                  postalCode: "10001"
+                  country: "US"
+                ship_to:
+                  street: "456 Oak St"
+                  city: "LA"
+                  state: "CA"
+                  postalCode: "90210"
+                  country: "US"
+                weight: 2.5
+              - ship_from:
+                  street: "789 Pine St"
+                  city: "Chicago"
+                  state: "IL"
+                  postalCode: "60601"
+                  country: "US"
+                ship_to:
+                  street: "321 Elm St"
+                  city: "Miami"
+                  state: "FL"
+                  postalCode: "33101"
+                  country: "US"
+                weight: 1.8
+          expect:
+            - statusCode: [200, 400]  # Accept both success and validation errors
+
+  # Shipping Analytics
+  - name: "Shipping Analytics"
+    weight: 5
+    flow:
+      - get:
+          url: "/api/shipping/analytics?period=30d&groupBy=carrier"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  # Return Shipment Creation
+  - name: "Create Return Shipment"
+    weight: 3
+    flow:
+      - post:
+          url: "/api/shipping/returns"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            original_shipment_id: "{{ $randomInt(1, 10000) }}"
+            return_reason: "Load test return"
+            return_address:
+              street: "123 Return Center"
+              city: "New York"
+              state: "NY"
+              postalCode: "10001"
+              country: "US"
+          expect:
+            - statusCode: [201, 400, 404]  # Accept various responses
+
+  # Get Return Shipments
+  - name: "Get Return Shipments"
+    weight: 7
+    flow:
+      - get:
+          url: "/api/shipping/returns?page={{ $randomInt(1, 2) }}&limit=10&status={{ ['requested', 'approved', 'shipped', 'received'][$randomInt(0, 3)] }}"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200

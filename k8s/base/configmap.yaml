@@ -1,0 +1,73 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: marketplace-config
+  namespace: marketplace
+data:
+  # Database Configuration
+  MYSQL_ROOT_PASSWORD: "rootpassword"
+  MYSQL_DATABASE: "fenap_marketplace"
+  MYSQL_USER: "marketplace"
+  MYSQL_PASSWORD: "marketplace123"
+  MYSQL_PORT: "3306"
+
+  # Redis Configuration
+  REDIS_PORT: "6379"
+
+  # RabbitMQ Configuration
+  RABBITMQ_USER: "admin"
+  RABBITMQ_PASSWORD: "admin123"
+  RABBITMQ_VHOST: "marketplace"
+  RABBITMQ_PORT: "5672"
+  RABBITMQ_MANAGEMENT_PORT: "15672"
+
+  # JWT Configuration
+  JWT_SECRET: "your-super-secure-jwt-secret-key-change-in-production-minimum-32-characters"
+  JWT_EXPIRES_IN: "1h"
+  JWT_REFRESH_EXPIRES_IN: "7d"
+
+  # Service Ports
+  GATEWAY_PORT: "9000"
+  AUTH_PORT: "9001"
+  PRODUCTS_PORT: "9002"
+  TRANSACTIONS_PORT: "9003"
+  MESSAGING_PORT: "9004"
+  NOTIFICATIONS_PORT: "9005"
+  ADVERTISING_PORT: "9006"
+  TICKETING_PORT: "9007"
+  REVIEWS_PORT: "9008"
+  PROMOTIONS_PORT: "9009"
+  SHIPPING_PORT: "9010"
+  RECOMMENDER_PORT: "9011"
+  SYSTEM_PORT: "9012"
+  ANALYTICS_PORT: "9013"
+  WISHLIST_PORT: "9014"
+  SEARCH_PORT: "9015"
+  SEO_PORT: "9016"
+  LOYALTY_PORT: "9017"
+  SOCIAL_PORT: "9018"
+  ENHANCED_ANALYTICS_PORT: "9019"
+
+  # External URLs
+  FRONTEND_URL: "https://marketplace.example.com"
+  ADMIN_PORT: "3000"
+
+  # Email Configuration
+  EMAIL_HOST: "smtp.gmail.com"
+  EMAIL_PORT: "587"
+  EMAIL_USER: "noreply@marketplace.com"
+  ALERT_EMAIL_RECIPIENTS: '["admin@marketplace.com","alerts@marketplace.com"]'
+
+  # Payment Configuration
+  STRIPE_PUBLISHABLE_KEY: "pk_live_your_stripe_publishable_key"
+
+  # Shipping Configuration
+  FEDEX_API_KEY: "your_fedex_api_key"
+  UPS_ACCESS_KEY: "your_ups_access_key"
+  USPS_USERNAME: "your_usps_username"
+
+  # SMS Configuration (Twilio)
+  TWILIO_PHONE_NUMBER: "+1234567890"
+
+  # Push Notification Configuration (FCM)
+  FCM_SERVER_KEY: "your_fcm_server_key"

@@ -1,0 +1,122 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: products
+  namespace: marketplace
+  labels:
+    app: products
+    component: microservice
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: products
+  template:
+    metadata:
+      labels:
+        app: products
+        component: microservice
+    spec:
+      containers:
+      - name: products
+        image: marketplace/products:latest
+        ports:
+        - containerPort: 3002
+          name: http
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: PRODUCTS_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: marketplace-config
+              key: PRODUCTS_PORT
+        - name: JWT_SECRET
+          valueFrom:
+            configMapKeyRef:
+              name: marketplace-config
+              key: JWT_SECRET
+        - name: DATABASE_HOST
+          value: "mysql"
+        - name: DATABASE_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: marketplace-config
+              key: MYSQL_PORT
+        - name: DATABASE_USERNAME
+          valueFrom:
+            configMapKeyRef:
+              name: marketplace-config
+              key: MYSQL_USER
+        - name: DATABASE_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              name: marketplace-config
+              key: MYSQL_PASSWORD
+        - name: DATABASE_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: marketplace-config
+              key: MYSQL_DATABASE
+        - name: REDIS_HOST
+          value: "redis"
+        - name: REDIS_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: marketplace-config
+              key: REDIS_PORT
+        - name: RABBITMQ_URL
+          value: "amqp://$(RABBITMQ_USER):$(RABBITMQ_PASSWORD)@rabbitmq:5672/$(RABBITMQ_VHOST)"
+        - name: FRONTEND_URL
+          valueFrom:
+            configMapKeyRef:
+              name: marketplace-config
+              key: FRONTEND_URL
+        volumeMounts:
+        - name: uploads
+          mountPath: /app/uploads
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3002
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3002
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 2
+          failureThreshold: 3
+      volumes:
+      - name: uploads
+        persistentVolumeClaim:
+          claimName: uploads-data-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: products
+  namespace: marketplace
+  labels:
+    app: products
+    component: microservice
+spec:
+  selector:
+    app: products
+  ports:
+  - port: 3002
+    targetPort: 3002
+    name: http
+  type: ClusterIP

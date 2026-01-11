@@ -1,0 +1,104 @@
+# Auth Service Load Testing Scenarios
+
+scenarios:
+  # User Registration
+  - name: "User Registration"
+    weight: 10
+    flow:
+      - post:
+          url: "/api/auth/register"
+          json:
+            username: "testuser_{{ $randomInt }}"
+            email: "testuser_{{ $randomInt }}@example.com"
+            password: "TestPassword123!"
+            firstName: "Test"
+            lastName: "User{{ $randomInt }}"
+          expect:
+            - statusCode: 201
+          capture:
+            json: "$.data.user.id"
+            as: "userId"
+
+  # User Login
+  - name: "User Login"
+    weight: 30
+    flow:
+      - post:
+          url: "/api/auth/login"
+          json:
+            email: "existinguser@example.com"
+            password: "TestPassword123!"
+          expect:
+            - statusCode: 200
+          capture:
+            json: "$.data.token"
+            as: "authToken"
+
+  # Token Refresh
+  - name: "Token Refresh"
+    weight: 5
+    flow:
+      - post:
+          url: "/api/auth/refresh"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  # Get User Profile
+  - name: "Get User Profile"
+    weight: 20
+    flow:
+      - get:
+          url: "/api/auth/profile"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  # Update User Profile
+  - name: "Update User Profile"
+    weight: 15
+    flow:
+      - put:
+          url: "/api/auth/profile"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            firstName: "Updated"
+            lastName: "Name{{ $randomInt }}"
+          expect:
+            - statusCode: 200
+
+  # Password Reset Request
+  - name: "Password Reset Request"
+    weight: 8
+    flow:
+      - post:
+          url: "/api/auth/forgot-password"
+          json:
+            email: "user@example.com"
+          expect:
+            - statusCode: 200
+
+  # User Logout
+  - name: "User Logout"
+    weight: 10
+    flow:
+      - post:
+          url: "/api/auth/logout"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  # Verify Email
+  - name: "Email Verification"
+    weight: 2
+    flow:
+      - post:
+          url: "/api/auth/verify-email"
+          json:
+            token: "fake_verification_token_{{ $randomInt }}"
+          expect:
+            - statusCode: [200, 400]  # Accept both valid and invalid tokens

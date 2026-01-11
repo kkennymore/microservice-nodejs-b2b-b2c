@@ -1,0 +1,45 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Use resources instead of bases (bases is deprecated)
+resources:
+  - ../../base
+
+# Namespace override
+namespace: marketplace
+
+# Environment-specific labels
+commonLabels:
+  environment: production
+
+# Image tag overrides
+images:
+  - name: marketplace/gateway
+    newTag: v1.0.0
+  - name: marketplace/auth
+    newTag: v1.0.0
+  - name: marketplace/products
+    newTag: v1.0.0
+  - name: marketplace/transactions
+    newTag: v1.0.0
+  - name: marketplace/messaging
+    newTag: v1.0.0
+  - name: marketplace/notifications
+    newTag: v1.0.0
+  - name: marketplace/advertising
+    newTag: v1.0.0
+  - name: marketplace/ticketing
+    newTag: v1.0.0
+  - name: marketplace/system
+    newTag: v1.0.0
+  - name: marketplace/analytics
+    newTag: v1.0.0
+  - name: marketplace/shipping
+    newTag: v1.0.0
+  - name: marketplace/admin-dashboard
+    newTag: v1.0.0
+
+# Production-specific patches
+patchesStrategicMerge:
+  - production-security.yaml
+  - production-scaling.yaml

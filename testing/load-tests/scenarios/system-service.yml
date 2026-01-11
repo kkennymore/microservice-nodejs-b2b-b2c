@@ -1,0 +1,250 @@
+# System Service Load Testing Scenarios
+
+scenarios:
+  # Get System Health
+  - name: "System Health Check"
+    weight: 20
+    flow:
+      - get:
+          url: "/api/system/health"
+          expect:
+            - statusCode: 200
+
+  # Get System Overview
+  - name: "System Overview"
+    weight: 15
+    flow:
+      - get:
+          url: "/api/system/overview"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  # Get Active Alerts
+  - name: "Get Active Alerts"
+    weight: 12
+    flow:
+      - get:
+          url: "/api/system/alerts"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  # Get System Settings
+  - name: "Get System Settings"
+    weight: 10
+    flow:
+      - get:
+          url: "/api/system/settings"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  # Update System Setting
+  - name: "Update System Setting"
+    weight: 5
+    flow:
+      - put:
+          url: "/api/system/settings/test_setting"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            value: "load_test_value_{{ $randomInt }}"
+            type: "string"
+          expect:
+            - statusCode: [200, 403]  # Accept both success and unauthorized
+
+  # Get User Management Data
+  - name: "Get User Management Data"
+    weight: 8
+    flow:
+      - get:
+          url: "/api/system/users?page={{ $randomInt(1, 5) }}&limit=20"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  # Get User Statistics
+  - name: "Get User Statistics"
+    weight: 6
+    flow:
+      - get:
+          url: "/api/system/users/stats"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  # Get Audit Logs
+  - name: "Get Audit Logs"
+    weight: 9
+    flow:
+      - get:
+          url: "/api/system/logs?page={{ $randomInt(1, 3) }}&limit=25"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  # Get Maintenance Schedule
+  - name: "Get Maintenance Schedule"
+    weight: 7
+    flow:
+      - get:
+          url: "/api/system/maintenance"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  # Schedule Maintenance
+  - name: "Schedule Maintenance"
+    weight: 3
+    flow:
+      - post:
+          url: "/api/system/maintenance"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            maintenance_type: "scheduled"
+            title: "Load Test Maintenance {{ $randomInt }}"
+            description: "Automated load testing maintenance window"
+            scheduled_start: "{{ new Date(Date.now() + 3600000).toISOString() }}"
+            scheduled_end: "{{ new Date(Date.now() + 7200000).toISOString() }}"
+            affected_services: ["analytics", "shipping"]
+          expect:
+            - statusCode: [201, 403]  # Accept both success and unauthorized
+
+  # Get Dashboard Summary
+  - name: "Dashboard Summary"
+    weight: 11
+    flow:
+      - get:
+          url: "/api/system/dashboard/summary"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  # Get Performance Metrics
+  - name: "Performance Metrics"
+    weight: 8
+    flow:
+      - get:
+          url: "/api/system/dashboard/metrics?hours=1"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  # Acknowledge Alert
+  - name: "Acknowledge Alert"
+    weight: 4
+    flow:
+      - post:
+          url: "/api/system/alerts/{{ $randomInt(1, 100) }}/acknowledge"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: [200, 404]  # Accept both success and not found
+
+  # Get Alert Statistics
+  - name: "Alert Statistics"
+    weight: 6
+    flow:
+      - get:
+          url: "/api/system/alerts/stats"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  # Start Maintenance
+  - name: "Start Maintenance"
+    weight: 2
+    flow:
+      - post:
+          url: "/api/system/maintenance/{{ $randomInt(1, 50) }}/start"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: [200, 403, 404]  # Accept various responses
+
+  # Complete Maintenance
+  - name: "Complete Maintenance"
+    weight: 2
+    flow:
+      - post:
+          url: "/api/system/maintenance/{{ $randomInt(1, 50) }}/complete"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: [200, 403, 404]  # Accept various responses
+
+  # Emergency Shutdown (disabled for load testing)
+  # - name: "Emergency Shutdown"
+  #   weight: 1
+  #   flow:
+  #     - post:
+  #         url: "/api/system/emergency/shutdown"
+  #         headers:
+  #           Authorization: "Bearer {{ authToken }}"
+  #         json:
+  #           reason: "Load test emergency shutdown"
+  #           scheduled_restart: "2024-12-31T23:59:59Z"
+  #         expect:
+  #           - statusCode: [200, 403]
+
+  # Export User Data
+  - name: "Export User Data"
+    weight: 3
+    flow:
+      - get:
+          url: "/api/system/users/export?limit=100"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: [200, 403]
+
+  # Bulk User Update
+  - name: "Bulk User Update"
+    weight: 2
+    flow:
+      - post:
+          url: "/api/system/users/bulk-update"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            userIds: ["{{ $randomInt(1, 1000) }}", "{{ $randomInt(1001, 2000) }}"]
+            updateData:
+              account_status: "active"
+          expect:
+            - statusCode: [200, 403]
+
+  # Flag User
+  - name: "Flag User"
+    weight: 4
+    flow:
+      - post:
+          url: "/api/system/users/{{ $randomInt(1, 10000) }}/flag"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            reason: "Load test user flagging"
+          expect:
+            - statusCode: [200, 403, 404]
+
+  # Get Flagged Users
+  - name: "Get Flagged Users"
+    weight: 5
+    flow:
+      - get:
+          url: "/api/system/users/flagged"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200

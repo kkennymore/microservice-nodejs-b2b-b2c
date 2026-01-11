@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Your Email - Multivendor Marketplace</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+        .title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #666;
+            font-size: 16px;
+        }
+        .content {
+            margin: 30px 0;
+        }
+        .button {
+            display: inline-block;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            padding: 15px 30px;
+            border-radius: 5px;
+            font-weight: bold;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #666;
+            font-size: 14px;
+            text-align: center;
+        }
+        .link {
+            color: #007bff;
+            word-break: break-all;
+        }
+        .warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🏪 Multivendor Marketplace</div>
+            <h1 class="title">Verify Your Email Address</h1>
+            <p class="subtitle">Welcome! Please verify your email to complete your registration.</p>
+        </div>
+
+        <div class="content">
+            <p>Hi <strong>{{firstName}}</strong>,</p>
+
+            <p>Thank you for registering with Multivendor Marketplace! To complete your registration and start buying or selling, please verify your email address.</p>
+
+            <div style="text-align: center;">
+                <a href="{{verificationUrl}}" class="button">Verify Email Address</a>
+            </div>
+
+            <p>If the button above doesn't work, you can copy and paste this link into your browser:</p>
+            <p class="link">{{verificationUrl}}</p>
+
+            <div class="warning">
+                <strong>Important:</strong> This verification link will expire in 24 hours. If you didn't create an account, please ignore this email.
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>If you have any questions, please contact our support team.</p>
+            <p>&copy; 2024 Multivendor Marketplace. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>
